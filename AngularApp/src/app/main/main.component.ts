@@ -13,13 +13,16 @@ export class MainComponent implements OnInit {
     
   }
 
-  ngOnInit(): void {
-  }
 
+  text?: String;
+  ngOnInit(): void {
+    this.text= "Studio Jajo";
+  }
+ 
 
   public apicall()
   {
-      return this.http.get<string>("https://localhost:44340/api/Api/StudioJajo").subscribe(value => value);
+    this.http.get("api/Api/StudioJajo", { responseType: 'text' }).subscribe(text => this.text=text);
   }
 
 }
