@@ -8,22 +8,20 @@ using System.Threading.Tasks;
 
 namespace project.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api")]
     [ApiController]
     public class ApiController : ControllerBase
     {
-        // GET: api/<ApiController>
         [HttpGet("StudioJajo")]
         public string Get()
         {
             return "Co oni tam nadają";
         }
 
-        // GET api/<ApiController>/5
-        [HttpGet("{id}")]
-        public string Get(int id)
+        [HttpGet("JakaMapaBedzieGrana")]
+        public string GetMap()
         {
-            return "value";
+            return "Dust 2";
         }
 
         // POST api/<ApiController>
