@@ -1,28 +1,30 @@
 import { Component, OnInit } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 
+const httpOptions = {
+  headers: new HttpHeaders({
+    responseType: 'text',
+  }),
+};
+
+const url = 'api/Api/StudioJajo';
 
 @Component({
   selector: 'app-main',
   templateUrl: './main.component.html',
-  styleUrls: ['./main.component.css']
+  styleUrls: ['./main.component.css'],
 })
 export class MainComponent implements OnInit {
+  constructor(private http: HttpClient) {}
 
-  constructor(private http: HttpClient,) { 
-    
-  }
-
-
-  text?: String;
+  text: any;
   ngOnInit(): void {
-    this.text= "Studio Jajo";
-  }
- 
-
-  public apicall()
-  {
-    this.http.get("api/Api/StudioJajo", { responseType: 'text' }).subscribe(text => this.text=text);
+    this.text = 'Studio Jajo';
   }
 
+  public apicall() {
+    this.http
+      .get(url, { responseType: 'text' })
+      .subscribe((text) => (this.text = text));
+  }
 }
