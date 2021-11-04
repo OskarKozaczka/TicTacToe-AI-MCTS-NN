@@ -1,0 +1,22 @@
+
+::ng-deep .square {
+	background-color: black;
+	width: 10%;
+	height: 10%;
+	float: left;
+	position: relative;
+	border-style: solid;
+	border-color: rgb(47, 224, 255);
+	box-sizing: border-box;
+	border-width: 2px;
+	align-items: center;
+}
+
+.board {
+	justify-content: center;
+	align-items: center;
+	width: 300px;
+	height: 300px;
+	margin: auto;
+	margin-top: 5%;
+}

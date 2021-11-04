@@ -5,11 +5,13 @@ import { AppComponent } from './app.component';
 import { MainComponent } from './main/main.component';
 import { HttpClientModule } from '@angular/common/http';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
+import { BoardComponent } from './board/board.component';
 
 @NgModule({
   declarations: [
     AppComponent,
-    MainComponent
+    MainComponent,
+    BoardComponent
   ],
   imports: [
     BrowserModule,
