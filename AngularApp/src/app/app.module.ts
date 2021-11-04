@@ -6,12 +6,14 @@ import { MainComponent } from './main/main.component';
 import { HttpClientModule } from '@angular/common/http';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { BoardComponent } from './board/board.component';
+import { PlaceholderComponent } from './placeholder/placeholder.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     MainComponent,
-    BoardComponent
+    BoardComponent,
+    PlaceholderComponent
   ],
   imports: [
     BrowserModule,
