@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { Router} from '@angular/router';
 
 const urlbase = 'api/GetMove/'
 
@@ -9,7 +10,7 @@ const urlbase = 'api/GetMove/'
 
 export class BackendService {
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient,private route:Router) { }
 
   GetMoveFromApi(id:String)
   {
