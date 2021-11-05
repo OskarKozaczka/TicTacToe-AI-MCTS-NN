@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { BackendService } from '../backend.service';
 
 @Component({
   selector: 'app-board',
@@ -9,7 +10,7 @@ import { Component, OnInit } from '@angular/core';
 
 export class BoardComponent implements OnInit {
 
-  constructor() { }
+  constructor(private api: BackendService) { }
 
   ngOnInit(): void {
     for(var i = 0; i < 100; i += 1) {
@@ -24,5 +25,6 @@ export class BoardComponent implements OnInit {
   {
       var el = e.target as HTMLInputElement;
       el.style.backgroundColor = "red";
+      this.api.GetMoveFromApi("twój stary");
   }
 }

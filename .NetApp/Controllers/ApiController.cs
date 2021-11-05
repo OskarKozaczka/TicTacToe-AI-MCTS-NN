@@ -24,10 +24,11 @@ namespace project.Controllers
             return "Dust 2";
         }
 
-        // POST api/<ApiController>
-        [HttpPost]
-        public void Post([FromBody] string value)
+        // POST api/GetMove/id
+        [HttpPost("GetMove/{id}")]
+        public string Post(string id, [FromBody] string value)
         {
+            return "git";
         }
 
         // PUT api/<ApiController>/5
