@@ -3,9 +3,9 @@
   "version": "0.0.0",
   "scripts": {
     "ng": "ng",
-    "backend": "C:\\Users\\Oskar\\Documents\\GitHub\\project\\.NetApp\\bin\\Debug\\net5.0\\project",
-    "frontend": "ng serve --proxy-config proxy.conf.json --open",
-    "start": "concurrently --kill-others \"npm run backend\" \"npm run frontend\"",
+    "backend": "C:/project/.NetApp/bin/Debug/net5.0/project",
+    "start": "ng serve --proxy-config proxy.conf.json --open",
+    "start-old": "concurrently --kill-others \"npm run backend\" \"npm run frontend\"",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test"

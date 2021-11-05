@@ -18,8 +18,6 @@ export class BoardComponent implements OnInit {
       div.onclick = this.onsquareclick;
       document.body.getElementsByClassName("board")[0].appendChild(div);
     }
-    console.log(document.body.getElementsByClassName("board"));
-
   }
 
   public onsquareclick(e:MouseEvent)
@@ -27,5 +25,4 @@ export class BoardComponent implements OnInit {
       var el = e.target as HTMLInputElement;
       el.style.backgroundColor = "red";
   }
-
 }

@@ -1,12 +1,12 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { BoardComponent } from './board/board.component';
-import { MainComponent } from './main/main.component';
+import { TestComponent } from './test/test.component';
 import { PlaceholderComponent } from './placeholder/placeholder.component';
+import { GameComponent } from './game/game.component';
 
 const routes: Routes = [
-  { path: 'game', component: BoardComponent },
-  { path: 'test', component: MainComponent },
+  { path: 'game/:id', component: GameComponent },
+  { path: 'test', component: TestComponent },
   { path: '', component: PlaceholderComponent }
 ];
 

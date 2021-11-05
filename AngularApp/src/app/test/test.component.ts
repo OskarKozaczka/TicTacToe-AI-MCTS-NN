@@ -7,14 +7,14 @@ const httpOptions = {
   }),
 };
 
-const url = 'api/Api/StudioJajo';
+const url = 'api/StudioJajo';
 
 @Component({
   selector: 'app-main',
-  templateUrl: './main.component.html',
-  styleUrls: ['./main.component.css'],
+  templateUrl: './test.component.html',
+  styleUrls: ['./test.component.css'],
 })
-export class MainComponent implements OnInit {
+export class TestComponent implements OnInit {
   constructor(private http: HttpClient) {}
 
   text: any;
