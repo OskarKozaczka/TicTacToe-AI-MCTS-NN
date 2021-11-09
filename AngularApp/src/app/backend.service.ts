@@ -1,24 +1,18 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Router} from '@angular/router';
+import { Move } from './Move';
 
-const urlbase = 'api/GetMove/'
+const urlbase = 'api/GetMove/';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
-
 export class BackendService {
+  constructor(private http: HttpClient) {}
 
-  constructor(private http: HttpClient,private route:Router) { }
-
-  GetMoveFromApi(id:String)
-  {
-    var url = urlbase + String(this.route.snapshot.paramMap.get('id'));;
-
-    this.http.post(url, { responseType: 'text'});
+  GetMoveFromApi(id: String, move: Move) {
+    var url = urlbase + id;
+    console.log(url);
+    this.http.post(url, move).subscribe();
   }
-
-
-
 }
