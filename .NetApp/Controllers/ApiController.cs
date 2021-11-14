@@ -26,21 +26,14 @@ namespace project.Controllers
 
         // POST api/GetMove/id
         [HttpPost("GetMove/{id}")]
-        public string Post(string id, [FromBody] string value)
-        {
-            return "git";
-        }
-
-        // PUT api/<ApiController>/5
-        [HttpPut("{id}")]
-        public void Put(int id, [FromBody] string value)
+        public void GetMovePost(string id, [FromBody] MoveModel value)
         {
         }
 
-        // DELETE api/<ApiController>/5
-        [HttpDelete("{id}")]
-        public void Delete(int id)
+        [HttpPost("CreateNewGame")]
+        public string CreateNewGamePost()
         {
+            return Game.CreateNewGame();
         }
     }
 }

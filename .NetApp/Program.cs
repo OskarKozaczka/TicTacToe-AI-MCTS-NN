@@ -13,6 +13,7 @@ namespace project
     {
         public static void Main(string[] args)
         {
+            Game.CreateNewGame();
             CreateHostBuilder(args).Build().Run();
         }
 

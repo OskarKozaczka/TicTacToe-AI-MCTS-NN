@@ -1,4 +1,4 @@
 export interface Move {
-  x: Number;
-  y: number;
+  x: String;
+  y: String;
 }

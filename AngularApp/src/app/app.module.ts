@@ -8,6 +8,7 @@ import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { BoardComponent } from './board/board.component';
 import { PlaceholderComponent } from './placeholder/placeholder.component';
 import { GameComponent } from './game/game.component';
+import { StartComponent } from './start/start.component';
 
 @NgModule({
   declarations: [
@@ -15,7 +16,8 @@ import { GameComponent } from './game/game.component';
     TestComponent,
     BoardComponent,
     PlaceholderComponent,
-    GameComponent
+    GameComponent,
+    StartComponent
   ],
   imports: [
     BrowserModule,

@@ -11,18 +11,26 @@ export class BoardComponent implements OnInit {
   constructor(private api: BackendService) {}
 
   ngOnInit(): void {
-    for (var i = 0; i < 100; i += 1) {
-      var div = document.createElement('div');
-      div.className = 'square';
-      div.onclick = this.onsquareclick.bind(this);
-      document.body.getElementsByClassName('board')[0].appendChild(div);
+    for (var y = 0; y < 10; y += 1) {
+      for (var x = 0; x < 10; x += 1) {
+        var div = document.createElement('div');
+        div.className = 'square';
+        div.setAttribute('x', x.toString());
+        div.setAttribute('y', y.toString());
+        div.onclick = this.onsquareclick.bind(this);
+        document.body.getElementsByClassName('board')[0].appendChild(div);
+      }
     }
   }
 
   public onsquareclick(e: MouseEvent) {
     var el = e.target as HTMLInputElement;
     el.style.backgroundColor = 'red';
-    var move = { x: 2, y: 3 } as Move;
-    this.api.GetMoveFromApi('twojstary', move);
+    var MoveX = el.getAttribute('x') ?? '';
+    var MoveY = el.getAttribute('y') ?? '';
+    var move = { x: MoveX, y: MoveY } as Move;
+    // console.log(el.getAttribute('x'));
+    this.api.MakeMoveOnBoard(MoveX, MoveY);
+    this.api.GetMoveFromApi(move);
   }
 }

@@ -1,0 +1,4 @@
+export interface Move {
+  move: Move;
+  board: Array<Number>;
+}
