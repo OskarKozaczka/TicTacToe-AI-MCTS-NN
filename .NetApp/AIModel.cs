@@ -15,8 +15,6 @@ namespace project
             var ctx = new MLContext();
             IDataView trainingData = ctx.Data.LoadFromTextFile<GameData>("/data/journal/*.csv", hasHeader: false, separatorChar: ';');
         }
-        
-
     }
 
     public class GameData
