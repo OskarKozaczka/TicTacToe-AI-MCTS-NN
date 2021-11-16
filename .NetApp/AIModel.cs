@@ -34,8 +34,7 @@ namespace project
             var model = new Sequential();
             model.Add(new Dense(100, activation: "relu", input_shape: new Shape(10, 10)));
             model.Add(new Dense(64, activation: "relu"));
-            model.Add(new Dense(1, activation: "sigmoid"));
-            model.Add(new Flatten());
+            model.Add(new Dense(10, activation: "sigmoid"));
 
             model.Compile(optimizer: "sgd", loss: "binary_crossentropy", metrics: new string[] { "accuracy" });
             model.Summary();
@@ -50,15 +49,18 @@ namespace project
         public static void dataPreparation(out NDarray x,out NDarray y)
         {
             var features = new List<NDarray>();
-            var labels = new List<int>();
+            var labels = new List<NDarray>();
 
-
+            var emptyTable = new int[10, 10];
+            Array.Clear(emptyTable, 0, emptyTable.Length);
             var lines = File.ReadAllLines("data/journal/OOHSD.txt");
             foreach (var line in lines)
             {
                 features.Add(np.array(JsonConvert.DeserializeObject<int[,]>(line.Split(';')[0])));
                 Move move = JsonConvert.DeserializeObject<Move>(line.Split(';')[1]);
-                labels.Add(int.Parse(move.x.ToString() + move.y.ToString()));
+                var copy = emptyTable.Clone() as int[,];
+                copy[move.y, move.x] = 1;
+                labels.Add(np.array(copy));
             }
 
             x = np.array(features.ToArray());
