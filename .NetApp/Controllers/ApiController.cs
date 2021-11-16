@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -24,16 +25,23 @@ namespace project.Controllers
             return "Dust 2";
         }
 
+        [HttpGet("GetBoard/{id}")]
+        public string GetBoard(string id)
+        {
+            return JsonConvert.SerializeObject(GameManager.GamesDict[id].GetBoard());
+        }
+
         // POST api/GetMove/id
         [HttpPost("GetMove/{id}")]
         public void GetMovePost(string id, [FromBody] MoveModel value)
         {
+            GameManager.GamesDict[id].MakeMove(value);
         }
 
         [HttpPost("CreateNewGame")]
         public string CreateNewGamePost()
         {
-            return Game.CreateNewGame();
+            return GameManager.CreateNewGame();
         }
     }
 }

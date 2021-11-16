@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using System.IO;
 
 namespace project
 {
@@ -13,7 +14,7 @@ namespace project
     {
         public static void Main(string[] args)
         {
-            Game.CreateNewGame();
+            Directory.CreateDirectory("data/journal");
             CreateHostBuilder(args).Build().Run();
         }
 

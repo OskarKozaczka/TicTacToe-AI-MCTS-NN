@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using System.Text;
+using System.IO;
+using Newtonsoft.Json;
+
 
 namespace project
 {
@@ -10,25 +12,25 @@ namespace project
     {
         public string GameID { get; set; }
 
-        public int[][] Board { get; set; }
+        public int[,] Board { get; set; }
 
         public Game(string GameID)
         {
             this.GameID = GameID;
+            Board = new int[10,10];
+            Array.Clear(Board,0,Board.Length);
+            
         }
 
-        public static String CreateNewGame()
+        public void MakeMove(MoveModel move)
         {
-            Random rnd = new Random();
-            var Chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
-            StringBuilder sb = new StringBuilder();
-            for (int i = 0; i < 5; i++)
-            {
-                sb.Append(Chars[rnd.Next() % 61]);
-            }
-            var GameID = sb.ToString();
+            Board[move.y, move.x] = 1;
+            File.AppendAllText($"data/journal/{GameID}.csv", JsonConvert.SerializeObject(Board) +";"+ JsonConvert.SerializeObject(move));
+        }
 
-            return GameID;
+        public int[,] GetBoard()
+        {
+            return Board;
         }
     }
 }

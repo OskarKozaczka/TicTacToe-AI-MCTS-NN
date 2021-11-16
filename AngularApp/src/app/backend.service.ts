@@ -5,6 +5,7 @@ import { Router } from '@angular/router';
 
 const GetMoveUrl = 'api/GetMove/';
 const CreateNewGameUrl = 'api/CreateNewGame';
+const GetBoardUrl = 'api/GetBoard/';
 
 @Injectable({
   providedIn: 'root',
@@ -15,32 +16,23 @@ export class BackendService {
   Board: Number[][] = [];
   GameID: String = '';
 
-  GetMoveFromApi(move: Move) {
-    var url = GetMoveUrl + this.GameID;
+  GetMoveFromApi(id: string, move: Move) {
+    var url = GetMoveUrl + id;
     this.http.post(url, move).subscribe();
   }
 
   CreateNewGame() {
     var url = CreateNewGameUrl;
     this.http.post(url, null, { responseType: 'text' }).subscribe(
-      (text) => (
-        (this.GameID = text), this.router.navigate(['/game/' + this.GameID])
-      )
-      //(error) => console.log(error)
+      (text) => this.router.navigate(['/game/' + text]),
+      (error) => console.log('Error Creating a Game:' + error)
     );
-  }
-
-  RedirectToGame() {}
-
-  ResetBoard() {
-    for (let y = 0; y <= 100; y++) {
-      for (let x = 0; x <= 100; x++) {
-        this.Board[y][x] = 0;
-      }
-    }
   }
 
   MakeMoveOnBoard(x: string, y: string) {}
 
-  FetchBoard() {}
+  async GetBoard(id: string) {
+    var url = GetBoardUrl + id;
+    return this.http.get<Number[][]>(url).toPromise();
+  }
 }
