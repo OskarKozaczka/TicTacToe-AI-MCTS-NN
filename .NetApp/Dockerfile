@@ -21,17 +21,12 @@ RUN dotnet publish "project.csproj" -c Release -o /app/publish
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
-RUN apt-get update
-RUN apt install wget -y
-RUN apt install build-essential -y
-RUN apt install make -y
-RUN apt install xz-utils -y
-RUN apt install zlib1g-dev -y
-RUN apt install libffi-dev -y
+RUN apt -y update
+RUN apt install -y wget build-essential make xz-utils zlib1g-dev libffi-dev
 RUN wget https://www.python.org/ftp/python/3.7.4/Python-3.7.4.tar.xz
 RUN tar -xf Python-3.7.4.tar.xz
-RUN cd Python-3.7.4
-RUN ./Python-3.7.4/configure --enable-shared --enable-optimizations --prefix=/usr/local/lib
+RUN ./Python-3.7.4/configure --enable-shared --enable-optimizations --without-static-libpython --with-assertions -with-system-ffis
 RUN make install
+RUN chmod 777 ./libpython3.7m.so
 RUN export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib/
 ENTRYPOINT ["dotnet", "project.dll"]
