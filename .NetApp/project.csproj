@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
     <TargetFramework>net5.0</TargetFramework>
@@ -8,14 +8,11 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Keras.NET" Version="3.8.5" />
-    <PackageReference Include="Microsoft.ML" Version="1.7.0" />
+    <PackageReference Include="Keras.NET.Mono" Version="3.8.5" />
     <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.10.13" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+    <PackageReference Include="Numpy.Bare.Mono" Version="3.8.1.25" />
     <PackageReference Include="SciSharp.TensorFlow.Redist" Version="2.6.0" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="5.6.3" />
-    <PackageReference Include="TensorFlow.Keras" Version="0.6.4" />
-    <PackageReference Include="TensorFlow.NET" Version="0.60.4" />
   </ItemGroup>
-
 </Project>

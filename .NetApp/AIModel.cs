@@ -12,7 +12,7 @@ namespace project
 {
     public class AIModel
     {
-        static void start()
+        public static void start()
         {
 
             var model = createModel();
@@ -31,10 +31,11 @@ namespace project
 
         public static Sequential createModel()
         {
+            
             var model = new Sequential();
             model.Add(new Dense(100, activation: "relu", input_shape: new Shape(10, 10)));
             model.Add(new Dense(64, activation: "relu"));
-            model.Add(new Dense(10, activation: "sigmoid"));
+            model.Add(new Dense(10, activation: "softmax"));
 
             model.Compile(optimizer: "sgd", loss: "binary_crossentropy", metrics: new string[] { "accuracy" });
             model.Summary();
