@@ -15,7 +15,6 @@ namespace project
         public static void Main(string[] args)
         {
             Directory.CreateDirectory("data/journal");
-            AIModel.start();
             CreateHostBuilder(args).Build().Run();
         }
 

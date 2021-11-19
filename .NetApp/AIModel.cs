@@ -19,13 +19,9 @@ namespace project
             NDarray x;
             NDarray y;
             dataPreparation(out x, out y);
-
             model.Fit(x, y, batch_size: 2, epochs: 100, verbose: 1);
-
             saveModel(model);
-
             var test = np.array(JsonConvert.DeserializeObject<int[,]>(File.ReadAllLines("data/journal/OOHSD.txt")[0].Split(';')[0])).reshape(1, 10, 10);
-
             model.Predict(test);
         }
 
@@ -51,18 +47,27 @@ namespace project
         {
             var features = new List<NDarray>();
             var labels = new List<NDarray>();
-
             var emptyTable = new int[10, 10];
+
             Array.Clear(emptyTable, 0, emptyTable.Length);
-            var lines = File.ReadAllLines("data/journal/OOHSD.txt");
-            foreach (var line in lines)
+            try
             {
-                features.Add(np.array(JsonConvert.DeserializeObject<int[,]>(line.Split(';')[0])));
-                Move move = JsonConvert.DeserializeObject<Move>(line.Split(';')[1]);
-                var copy = emptyTable.Clone() as int[,];
-                copy[move.y, move.x] = 1;
-                labels.Add(np.array(copy));
+                var lines = File.ReadAllLines("data/journal/OOHSD.txt");
+                foreach (var line in lines)
+                {
+                    features.Add(np.array(JsonConvert.DeserializeObject<int[,]>(line.Split(';')[0])));
+                    Move move = JsonConvert.DeserializeObject<Move>(line.Split(';')[1]);
+                    var copy = emptyTable.Clone() as int[,];
+                    copy[move.y, move.x] = 1;
+                    labels.Add(np.array(copy));
+                }
             }
+            catch(Exception e)
+            {
+                throw new WrongDataFormatException("There was error reading the journal", e);
+            }
+            
+
 
             x = np.array(features.ToArray());
             y = np.array(labels.ToArray());
