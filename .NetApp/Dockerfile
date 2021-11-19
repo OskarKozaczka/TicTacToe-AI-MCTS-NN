@@ -11,19 +11,23 @@ RUN dotnet restore "./project.csproj"
 COPY . .
 WORKDIR "/src/."
 RUN dotnet build "project.csproj" -c Release -o /app/build
-RUN apt -y update
-RUN apt install -y wget build-essential make xz-utils zlib1g-dev libffi-dev openssl libssl-dev python3-pip
+
+FROM build AS publish
+RUN dotnet publish "project.csproj" -c Release -o /app/publish
+
+FROM base AS final
+WORKDIR /app
+COPY --from=publish /app/publish .
+
+ENV PYTHONNET_PYDLL=libpython3.7m.so
+ENV LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib/
+RUN apt update
+RUN apt install -y build-essential wget zlib1g-dev libffi-dev libssl-dev
 RUN wget https://www.python.org/ftp/python/3.7.4/Python-3.7.4.tar.xz
 RUN tar -xf Python-3.7.4.tar.xz
 RUN ./Python-3.7.4/configure --enable-shared
 RUN make install
-RUN chmod 777 ./libpython3.7m.so
-ENV LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib/
-ENV PYTHONNET_PYDLL=libpython3.7m.so
-RUN python3 -m pip install keras
-RUN python3 -m pip install numpy
-RUN python3 -m pip install tensorflow
-RUN apt install mono-devel -y
-RUN dotnet publish "project.csproj" -c Release -o /app
-WORKDIR /app
-ENTRYPOINT ["dotnet", "project.dll"]
+RUN pip3 install tensorflow
+
+
+ENTRYPOINT ["dotnet", "project.dll""]
