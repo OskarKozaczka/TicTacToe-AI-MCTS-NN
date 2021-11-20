@@ -33,9 +33,9 @@ namespace project.Controllers
 
         // POST api/GetMove/id
         [HttpPost("GetMove/{id}")]
-        public void GetMovePost(string id, [FromBody] MoveModel value)
+        public int GetMovePost(string id, [FromBody] MoveModel value)
         {
-            GameManager.GamesDict[id].MakeMove(value);
+            return GameManager.GamesDict[id].MakeMove(value);
         }
 
         [HttpPost("CreateNewGame")]

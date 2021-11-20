@@ -22,10 +22,11 @@ namespace project
             
         }
 
-        public void MakeMove(MoveModel move)
+        public int MakeMove(MoveModel move)
         {
+            File.AppendAllText($"data/journal/{GameID}.txt", JsonConvert.SerializeObject(Board) + ";" + JsonConvert.SerializeObject(move) + "\n");
             Board[move.y, move.x] = 1;
-            File.AppendAllText($"data/journal/{GameID}.csv", JsonConvert.SerializeObject(Board) +";"+ JsonConvert.SerializeObject(move));
+            return AIModel.GetMove(Board);
         }
 
         public int[,] GetBoard()

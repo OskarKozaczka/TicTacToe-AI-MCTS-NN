@@ -12,6 +12,8 @@ namespace project
 {
     public class AIModel
     {
+        private static BaseModel Model;
+
         public static void start()
         {
 
@@ -19,24 +21,26 @@ namespace project
             NDarray x;
             NDarray y;
             dataPreparation(out x, out y);
-            model.Fit(x, y, batch_size: 2, epochs: 100, verbose: 1);
-            saveModel(model);
-            var test = np.array(JsonConvert.DeserializeObject<int[,]>(File.ReadAllLines("data/journal/OOHSD.txt")[0].Split(';')[0])).reshape(1, 10, 10);
-            model.Predict(test);
+            model.Fit(x, y, batch_size: 1, epochs: 1000, verbose: 1);
+            SaveModel(model);
+            var journal = Directory.GetFiles("data/journal");
+            var test = np.array(JsonConvert.DeserializeObject<int[,]>(File.ReadAllLines(journal[0])[0].Split(';')[0])).reshape(1, 10,10);
+            Console.WriteLine(model.Predict(test));
         }
 
         public static Sequential createModel()
         {
             
             var model = new Sequential();
-            model.Add(new Dense(100, activation: "relu", input_shape: new Shape(10, 10)));
-            model.Add(new Dense(64, activation: "relu"));
-            model.Add(new Dense(10, activation: "softmax"));
+            model.Add(new Dense(100, activation: "relu", input_shape: new Shape(10,10)));
+            model.Add(new Flatten());
+            model.Add(new Dense(100, activation: "softmax"));
 
             model.Compile(optimizer: "sgd", loss: "binary_crossentropy", metrics: new string[] { "accuracy" });
             model.Summary();
             return model;
         }
+
         public class Move
         {
             public int x { set; get; }
@@ -52,40 +56,69 @@ namespace project
             Array.Clear(emptyTable, 0, emptyTable.Length);
             try
             {
-                var lines = File.ReadAllLines("data/journal/OOHSD.txt");
-                foreach (var line in lines)
+                var journal = Directory.GetFiles("data/journal");
+                foreach (var entry in journal)
                 {
-                    features.Add(np.array(JsonConvert.DeserializeObject<int[,]>(line.Split(';')[0])));
-                    Move move = JsonConvert.DeserializeObject<Move>(line.Split(';')[1]);
-                    var copy = emptyTable.Clone() as int[,];
-                    copy[move.y, move.x] = 1;
-                    labels.Add(np.array(copy));
+                    File.WriteAllText(entry, File.ReadAllText(entry).TrimEnd());
+                    var lines = File.ReadAllLines(entry);
+                    foreach (var line in lines)
+                    {
+                        features.Add(np.array(JsonConvert.DeserializeObject<int[,]>(line.Split(';')[0])));
+                        Move move = JsonConvert.DeserializeObject<Move>(line.Split(';')[1]);
+                        var copy = emptyTable.Clone() as int[,];
+                        copy[move.y, move.x] = 1;
+                        labels.Add(np.array(copy).reshape(100));
+                    }
                 }
+          
             }
-            catch(Exception e)
+            catch (FileNotFoundException e)
             {
-                throw new WrongDataFormatException("There was error reading the journal", e);
+                throw new FileNotFoundException("Journal is empty", e);
+            }
+            catch (Exception e)
+            {
+                throw new WrongDataException("There was error reading the journal", e);
             }
             
-
-
             x = np.array(features.ToArray());
             y = np.array(labels.ToArray());
         }
-        public static void saveModel(Sequential model)
+
+        public static void SaveModel(Sequential model)
         {
             string json = model.ToJson();
-            File.WriteAllText("model.json", json);
-            model.SaveWeight("model.h5");
+            File.WriteAllText("data/model/model.json", json);
+            model.SaveWeight("data/model/model.h5");
         }
 
-        public static BaseModel LoadModel()
+        public static void LoadModel()
         {
-            var loaded_model = Sequential.ModelFromJson(File.ReadAllText("model.json"));
-            loaded_model.LoadWeight("model.h5");
-            return loaded_model;
+            try
+            {
+                Model = Sequential.ModelFromJson(File.ReadAllText("data/model/model.json"));
+                Model.LoadWeight("data/model/model.h5");
+            }
+            catch
+            {
+                Console.WriteLine("Model was not found, creating a new one");
+                Model = createModel();
+            }
         }
 
+        public static int GetMove(int[,] Board)
+        {
+            for (int y = 0; y < 10; y++)
+            {
+                for (int x = 0; x < 10; x++)
+                {
+                    Board[x, y] = Board[x, y] * -1;
+                }
+            }
+
+            var result = Model.Predict(Board).GetData<int[,]>().ToList();
+            return result.IndexOf(result.Max());
+        }
     }
 }
    

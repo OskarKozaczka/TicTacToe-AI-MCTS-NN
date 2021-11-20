@@ -24,10 +24,13 @@ export class BoardComponent implements OnInit {
   }
 
   public createTable() {
+    var i = 0;
     for (var y = 0; y < 10; y += 1) {
       for (var x = 0; x < 10; x += 1) {
         var div = document.createElement('div');
         div.className = 'square';
+        div.setAttribute('id', i.toString());
+        i++;
         div.setAttribute('x', x.toString());
         div.setAttribute('y', y.toString());
         if (this.Board[y][x] === 1) {
