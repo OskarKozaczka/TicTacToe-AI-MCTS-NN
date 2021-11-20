@@ -26,7 +26,10 @@ namespace project
         {
             File.AppendAllText($"data/journal/{GameID}.txt", JsonConvert.SerializeObject(Board) + ";" + JsonConvert.SerializeObject(move) + "\n");
             Board[move.y, move.x] = 1;
-            return AIModel.GetMove(Board);
+            var AImove = AIModel.GetMove(Board.Clone() as int[,]);
+            var AImoveS = AImove.ToString();
+            Board[(int)char.GetNumericValue(AImoveS[0]), (int)char.GetNumericValue(AImoveS[1])] = -1;
+            return AImove;
         }
 
         public int[,] GetBoard()

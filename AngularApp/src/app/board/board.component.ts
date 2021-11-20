@@ -35,6 +35,8 @@ export class BoardComponent implements OnInit {
         div.setAttribute('y', y.toString());
         if (this.Board[y][x] === 1) {
           div.style.backgroundColor = 'red';
+        } else if (this.Board[y][x] === -1) {
+          div.style.backgroundColor = 'green';
         }
         div.onclick = this.onsquareclick.bind(this);
         document.body.getElementsByClassName('board')[0].appendChild(div);
@@ -50,9 +52,10 @@ export class BoardComponent implements OnInit {
     var move = { x: MoveX, y: MoveY } as Move;
     // console.log(el.getAttribute('x'));
     this.api.MakeMoveOnBoard(MoveX, MoveY);
-    this.api.GetMoveFromApi(
+    var id = this.api.GetMoveFromApi(
       String(this.route.snapshot.paramMap.get('id')),
       move
     );
+    document.getElementById(id.toString())!.style.backgroundColor = 'green';
   }
 }

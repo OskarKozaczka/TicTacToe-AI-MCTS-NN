@@ -10,22 +10,24 @@ using Keras;
 
 namespace project
 {
-    public class AIModel
+    public static class AIModel
     {
-        private static BaseModel Model;
+        private static Sequential Model;
+        private static NDarray test;
 
         public static void start()
         {
 
-            var model = createModel();
             NDarray x;
             NDarray y;
             dataPreparation(out x, out y);
-            model.Fit(x, y, batch_size: 1, epochs: 1000, verbose: 1);
-            SaveModel(model);
+            createModel();
+            //model.Fit(x, y, batch_size: 1, epochs: 100, verbose: 1);
+            //SaveModel();
             var journal = Directory.GetFiles("data/journal");
-            var test = np.array(JsonConvert.DeserializeObject<int[,]>(File.ReadAllLines(journal[0])[0].Split(';')[0])).reshape(1, 10,10);
-            Console.WriteLine(model.Predict(test));
+            test = np.array(JsonConvert.DeserializeObject<int[,]>(File.ReadAllLines(journal[0])[0].Split(';')[0])).reshape(1, 10,10);
+            Console.WriteLine(Model.Predict(test));
+
         }
 
         public static Sequential createModel()
@@ -35,9 +37,10 @@ namespace project
             model.Add(new Dense(100, activation: "relu", input_shape: new Shape(10,10)));
             model.Add(new Flatten());
             model.Add(new Dense(100, activation: "softmax"));
-
             model.Compile(optimizer: "sgd", loss: "binary_crossentropy", metrics: new string[] { "accuracy" });
             model.Summary();
+            Model = model;
+            SaveModel();
             return model;
         }
 
@@ -85,19 +88,20 @@ namespace project
             y = np.array(labels.ToArray());
         }
 
-        public static void SaveModel(Sequential model)
+        public static void SaveModel()
         {
-            string json = model.ToJson();
-            File.WriteAllText("data/model/model.json", json);
-            model.SaveWeight("data/model/model.h5");
+            File.WriteAllText("data/model/model.json", Model.ToJson());
+            Model.SaveWeight("data/model/model.h5");
         }
 
         public static void LoadModel()
         {
             try
             {
-                Model = Sequential.ModelFromJson(File.ReadAllText("data/model/model.json"));
-                Model.LoadWeight("data/model/model.h5");
+                Sequential loadedModel = createModel();
+                loadedModel.LoadWeight("data/model/model.h5");
+                Model = loadedModel;
+
             }
             catch
             {
@@ -109,15 +113,19 @@ namespace project
         public static int GetMove(int[,] Board)
         {
             for (int y = 0; y < 10; y++)
+            for (int x = 0; x < 10; x++)
             {
-                for (int x = 0; x < 10; x++)
-                {
-                    Board[x, y] = Board[x, y] * -1;
-                }
+                Board[x, y] = Board[x, y] * -1;
             }
+            
+            LoadModel();
+            var journal = Directory.GetFiles("data/journal");
+            var test = np.array(Board).reshape(1, 10, 10);
+            var result = Model.Predict(test);
+            var resultL = result.GetData<float>().ToList();
+            var AImove = resultL.IndexOf(resultL.Max());
+            return AImove;
 
-            var result = Model.Predict(Board).GetData<int[,]>().ToList();
-            return result.IndexOf(result.Max());
         }
     }
 }

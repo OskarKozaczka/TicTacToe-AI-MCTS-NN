@@ -16,9 +16,9 @@ namespace project
         {
             Directory.CreateDirectory("data/journal");
             Directory.CreateDirectory("data/model");
-            AIModel.LoadModel();
+            //AIModel.LoadModel();
             //AIModel.start();
-            CreateHostBuilder(args).Build().Run();
+            CreateHostBuilder(args).Build().StartAsync();
         }
 
         public static IHostBuilder CreateHostBuilder(string[] args) =>

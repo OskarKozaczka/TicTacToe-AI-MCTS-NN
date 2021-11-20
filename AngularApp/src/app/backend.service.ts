@@ -16,9 +16,11 @@ export class BackendService {
   Board: Number[][] = [];
   GameID: String = '';
 
-  GetMoveFromApi(id: string, move: Move) {
+  GetMoveFromApi(id: string, move: Move): number {
     var url = GetMoveUrl + id;
-    this.http.post(url, move).subscribe();
+    var moveid: number = 0;
+    this.http.post<number>(url, move).subscribe((data) => (moveid = data));
+    return moveid;
   }
 
   CreateNewGame() {
