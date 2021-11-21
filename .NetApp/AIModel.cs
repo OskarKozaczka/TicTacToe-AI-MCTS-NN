@@ -7,6 +7,9 @@ using Numpy;
 using Keras.Models;
 using Keras.Layers;
 using Keras;
+using System.Threading;
+using System.Threading.Tasks;
+using Python.Runtime;
 
 namespace project
 {
@@ -32,16 +35,14 @@ namespace project
 
         public static Sequential createModel()
         {
-            
-            var model = new Sequential();
-            model.Add(new Dense(100, activation: "relu", input_shape: new Shape(10,10)));
-            model.Add(new Flatten());
-            model.Add(new Dense(100, activation: "softmax"));
-            model.Compile(optimizer: "sgd", loss: "binary_crossentropy", metrics: new string[] { "accuracy" });
-            model.Summary();
-            Model = model;
-            SaveModel();
-            return model;
+                var model = new Sequential();
+                model.Add(new Dense(100, activation: "relu", input_shape: new Shape(10, 10)));
+                model.Add(new Flatten());
+                model.Add(new Dense(100, activation: "softmax"));
+                model.Compile(optimizer: "sgd", loss: "binary_crossentropy", metrics: new string[] { "accuracy" });
+                model.Summary();
+                Model = model;
+                return model; 
         }
 
         public class Move
@@ -96,12 +97,12 @@ namespace project
 
         public static void LoadModel()
         {
+            
             try
             {
                 Sequential loadedModel = createModel();
                 loadedModel.LoadWeight("data/model/model.h5");
                 Model = loadedModel;
-
             }
             catch
             {
@@ -110,22 +111,41 @@ namespace project
             }
         }
 
+        //public async static Task<int> GetMoveT(int[,] Board)
+        //{
+        //    var result = await Task.Run(() => {
+        //        return GetMoveThread(Board);
+        //    });
+        //    return result;
+
+        //}
+
         public static int GetMove(int[,] Board)
         {
             for (int y = 0; y < 10; y++)
-            for (int x = 0; x < 10; x++)
+                for (int x = 0; x < 10; x++)
+                {
+                    Board[x, y] = Board[x, y] * -1;
+                }
+            
+            //if (Model == null) LoadModel();
+            var journal = Directory.GetFiles("data/journal");
+            List<float> resultL;
+            
+            using (Py.GIL())
             {
-                Board[x, y] = Board[x, y] * -1;
+                NDarray result;
+                var test = np.array(Board).reshape(1, 10, 10);
+                Sequential loadedModel = createModel();
+                loadedModel.LoadWeight("data/model/model.h5");
+                result = loadedModel.Predict(test);
+                resultL = result.GetData<float>().ToList();
             }
             
-            LoadModel();
-            var journal = Directory.GetFiles("data/journal");
-            var test = np.array(Board).reshape(1, 10, 10);
-            var result = Model.Predict(test);
-            var resultL = result.GetData<float>().ToList();
+
+
             var AImove = resultL.IndexOf(resultL.Max());
             return AImove;
-
         }
     }
 }

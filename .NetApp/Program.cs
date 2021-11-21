@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System.IO;
+using Python.Runtime;
 
 namespace project
 {
@@ -16,9 +17,11 @@ namespace project
         {
             Directory.CreateDirectory("data/journal");
             Directory.CreateDirectory("data/model");
+            PythonEngine.Initialize();
+            PythonEngine.BeginAllowThreads();
             //AIModel.LoadModel();
             //AIModel.start();
-            CreateHostBuilder(args).Build().StartAsync();
+            CreateHostBuilder(args).Build().Run();
         }
 
         public static IHostBuilder CreateHostBuilder(string[] args) =>

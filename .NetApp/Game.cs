@@ -28,6 +28,7 @@ namespace project
             Board[move.y, move.x] = 1;
             var AImove = AIModel.GetMove(Board.Clone() as int[,]);
             var AImoveS = AImove.ToString();
+            if (AImoveS.Length == 1) AImoveS ="0" + AImoveS;
             Board[(int)char.GetNumericValue(AImoveS[0]), (int)char.GetNumericValue(AImoveS[1])] = -1;
             return AImove;
         }
