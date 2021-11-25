@@ -15,7 +15,7 @@ namespace project
 {
     public static class AIModel
     {
-        private static Sequential Model;
+        private static BaseModel Model;
         private static NDarray test;
 
         public static void start()
@@ -97,28 +97,20 @@ namespace project
 
         public static void LoadModel()
         {
-            
-            try
-            {
-                Sequential loadedModel = createModel();
-                loadedModel.LoadWeight("data/model/model.h5");
-                Model = loadedModel;
-            }
-            catch
-            {
-                Console.WriteLine("Model was not found, creating a new one");
-                Model = createModel();
-            }
+                try
+                {
+                    var loadedModel = Sequential.ModelFromJson(File.ReadAllText("data/model/model.json"));
+                    loadedModel.LoadWeight("data/model/model.h5");
+                    Model = loadedModel;
+
+                }
+                catch
+                {
+                    Console.WriteLine("Model was not found, creating a new one");
+                    Model = createModel();
+                    SaveModel();
+                }
         }
-
-        //public async static Task<int> GetMoveT(int[,] Board)
-        //{
-        //    var result = await Task.Run(() => {
-        //        return GetMoveThread(Board);
-        //    });
-        //    return result;
-
-        //}
 
         public static int GetMove(int[,] Board)
         {
@@ -128,7 +120,6 @@ namespace project
                     Board[x, y] = Board[x, y] * -1;
                 }
             
-            //if (Model == null) LoadModel();
             var journal = Directory.GetFiles("data/journal");
             List<float> resultL;
             
@@ -136,16 +127,27 @@ namespace project
             {
                 NDarray result;
                 var test = np.array(Board).reshape(1, 10, 10);
-                Sequential loadedModel = createModel();
-                loadedModel.LoadWeight("data/model/model.h5");
-                result = loadedModel.Predict(test);
+                if (Model == null) LoadModel();
+                result = Model.Predict(test);
                 resultL = result.GetData<float>().ToList();
             }
             
-
-
             var AImove = resultL.IndexOf(resultL.Max());
             return AImove;
+        }
+
+        public static void TrainModel()
+        {
+            using (Py.GIL())
+            {
+                NDarray x;
+                NDarray y;
+                dataPreparation(out x, out y);
+                LoadModel();
+                Model.Fit(x, y, batch_size: 1, epochs: 100, verbose: 1);
+                SaveModel();
+            }
+            
         }
     }
 }
