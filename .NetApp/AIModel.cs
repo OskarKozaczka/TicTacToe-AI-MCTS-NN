@@ -121,7 +121,7 @@ namespace project
                     Board[x, y] = Board[x, y] * -1;
                 }
             int? Move = null;
-            while(Move == null || Board[Move> 10 ? Move.ToString()[0] : 0, Move.ToString()[1]] != 0 )
+            while(Move == null || Board[Move >= 10 ? Move.ToString()[0] : 0, Move.ToString()[1]] != 0 )
             {
                 Move = AIPredict(Board);
             }
@@ -137,7 +137,7 @@ namespace project
             using (Py.GIL())
             {
                 if (Model == null) LoadModel();
-                result = Model.Predict(test);
+                result = Model.Predict(np.array(Board).reshape(1, 10, 10));
                 resultL = result.GetData<float>().ToList();
             }
 
@@ -156,7 +156,7 @@ namespace project
                 Model.Compile(optimizer: "sgd", loss: "binary_crossentropy", metrics: new string[] { "accuracy" });
                 if (Directory.GetFiles("data/journal").Any())
                 {
-                    Model.Fit(x, y, batch_size: 1, epochs: 100, verbose: 1);
+                    Model.Fit(x, y, batch_size: 1, epochs: 10, verbose: 1);
                 }
                 
                 SaveModel();
