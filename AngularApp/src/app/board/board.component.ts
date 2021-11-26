@@ -44,7 +44,7 @@ export class BoardComponent implements OnInit {
     }
   }
 
-  public onsquareclick(e: MouseEvent) {
+  public async onsquareclick(e: MouseEvent) {
     var el = e.target as HTMLInputElement;
     el.style.backgroundColor = 'red';
     var MoveX = el.getAttribute('x') ?? '';
@@ -52,7 +52,7 @@ export class BoardComponent implements OnInit {
     var move = { x: MoveX, y: MoveY } as Move;
     // console.log(el.getAttribute('x'));
     this.api.MakeMoveOnBoard(MoveX, MoveY);
-    var id = this.api.GetMoveFromApi(
+    var id = await this.api.GetMoveFromApi(
       String(this.route.snapshot.paramMap.get('id')),
       move
     );

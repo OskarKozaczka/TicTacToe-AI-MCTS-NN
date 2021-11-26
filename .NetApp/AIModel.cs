@@ -63,15 +63,18 @@ namespace project
                 var journal = Directory.GetFiles("data/journal");
                 foreach (var entry in journal)
                 {
-                    File.WriteAllText(entry, File.ReadAllText(entry).TrimEnd());
                     var lines = File.ReadAllLines(entry);
                     foreach (var line in lines)
                     {
-                        features.Add(np.array(JsonConvert.DeserializeObject<int[,]>(line.Split(';')[0])));
-                        Move move = JsonConvert.DeserializeObject<Move>(line.Split(';')[1]);
-                        var copy = emptyTable.Clone() as int[,];
-                        copy[move.y, move.x] = 1;
-                        labels.Add(np.array(copy).reshape(100));
+                        if (!string.IsNullOrWhiteSpace(line))
+                        {
+                            features.Add(np.array(JsonConvert.DeserializeObject<int[,]>(line.Split(';')[0])));
+                            Move move = JsonConvert.DeserializeObject<Move>(line.Split(';')[1]);
+                            var copy = emptyTable.Clone() as int[,];
+                            copy[move.y, move.x] = 1;
+                            labels.Add(np.array(copy).reshape(100));
+                        }
+
                     }
                 }
           
@@ -144,7 +147,12 @@ namespace project
                 NDarray y;
                 dataPreparation(out x, out y);
                 LoadModel();
-                Model.Fit(x, y, batch_size: 1, epochs: 100, verbose: 1);
+                Model.Compile(optimizer: "sgd", loss: "binary_crossentropy", metrics: new string[] { "accuracy" });
+                if (Directory.GetFiles("data/journal").Any())
+                {
+                    Model.Fit(x, y, batch_size: 1, epochs: 100, verbose: 1);
+                }
+                
                 SaveModel();
             }
             

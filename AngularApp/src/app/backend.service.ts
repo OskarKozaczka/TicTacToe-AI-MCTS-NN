@@ -16,11 +16,9 @@ export class BackendService {
   Board: Number[][] = [];
   GameID: String = '';
 
-  GetMoveFromApi(id: string, move: Move): number {
+  async GetMoveFromApi(id: string, move: Move) {
     var url = GetMoveUrl + id;
-    var moveid: number = 0;
-    this.http.post<number>(url, move).subscribe((data) => (moveid = data));
-    return moveid;
+    return await this.http.post<number>(url, move).toPromise();
   }
 
   CreateNewGame() {
