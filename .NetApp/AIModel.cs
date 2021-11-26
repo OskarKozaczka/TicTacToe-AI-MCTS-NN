@@ -98,19 +98,19 @@ namespace project
 
         public static void LoadModel()
         {
-                try
-                {
-                    var loadedModel = Sequential.ModelFromJson(File.ReadAllText("data/model/model.json"));
-                    loadedModel.LoadWeight("data/model/model.h5");
-                    Model = loadedModel;
+            try
+            {
+                var loadedModel = Sequential.ModelFromJson(File.ReadAllText("data/model/model.json"));
+                loadedModel.LoadWeight("data/model/model.h5");
+                Model = loadedModel;
 
-                }
-                catch
-                {
-                    Console.WriteLine("Model was not found, creating a new one");
-                    Model = createModel();
-                    SaveModel();
-                }
+            }
+            catch
+            {
+                Console.WriteLine("Model was not found, creating a new one");
+                Model = createModel();
+                SaveModel();
+            }
         }
 
         public static int GetMove(int[,] Board)
@@ -120,16 +120,18 @@ namespace project
                 {
                     Board[x, y] = Board[x, y] * -1;
                 }
-            int? Move = null;
-            while(Move == null || Board[Move >= 10 ? Move.ToString()[0] : 0, Move.ToString()[1]] != 0 )
+            int Move = -1;
+            var index = 0;
+            while(Move == -1 || Board[Move/10,Move%10] != 0 )
             {
-                Move = AIPredict(Board);
+                Move = AIPredict(Board,index);
+                index++;
             }
 
-            return (int)Move;
+            return Move;
         }
 
-        private static int AIPredict(int[,] Board)
+        private static int AIPredict(int[,] Board, int index)
         {
             List<float> resultL;
             NDarray result;
@@ -140,8 +142,9 @@ namespace project
                 result = Model.Predict(np.array(Board).reshape(1, 10, 10));
                 resultL = result.GetData<float>().ToList();
             }
-
-            var AImove = resultL.IndexOf(resultL.Max());
+            var resultSorted = resultL;
+            resultSorted.Sort();
+            var AImove = resultL.IndexOf(resultSorted[index]);
             return AImove;
         }
 
