@@ -7,8 +7,6 @@ using Numpy;
 using Keras.Models;
 using Keras.Layers;
 using Keras;
-using System.Threading;
-using System.Threading.Tasks;
 using Python.Runtime;
 
 namespace project
@@ -122,19 +120,27 @@ namespace project
                 {
                     Board[x, y] = Board[x, y] * -1;
                 }
-            
-            var journal = Directory.GetFiles("data/journal");
+            int? Move = null;
+            while(Move == null || Board[Move> 10 ? Move.ToString()[0] : 0, Move.ToString()[1]] != 0 )
+            {
+                Move = AIPredict(Board);
+            }
+
+            return (int)Move;
+        }
+
+        private static int AIPredict(int[,] Board)
+        {
             List<float> resultL;
-            
+            NDarray result;
+
             using (Py.GIL())
             {
-                NDarray result;
-                var test = np.array(Board).reshape(1, 10, 10);
                 if (Model == null) LoadModel();
                 result = Model.Predict(test);
                 resultL = result.GetData<float>().ToList();
             }
-            
+
             var AImove = resultL.IndexOf(resultL.Max());
             return AImove;
         }
