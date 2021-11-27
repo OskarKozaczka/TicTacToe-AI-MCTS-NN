@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace project
 {
-    public class MoveModel
+    public class Move
     {
         public int x { get; set; }
 

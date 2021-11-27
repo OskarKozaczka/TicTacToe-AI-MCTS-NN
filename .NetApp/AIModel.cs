@@ -33,20 +33,16 @@ namespace project
 
         public static Sequential createModel()
         {
-                var model = new Sequential();
-                model.Add(new Dense(100, activation: "relu", input_shape: new Shape(10, 10)));
-                model.Add(new Flatten());
-                model.Add(new Dense(100, activation: "softmax"));
-                model.Compile(optimizer: "sgd", loss: "binary_crossentropy", metrics: new string[] { "accuracy" });
-                model.Summary();
-                Model = model;
-                return model; 
-        }
-
-        public class Move
-        {
-            public int x { set; get; }
-            public int y { set; get; }
+            var model = new Sequential();
+            model.Add(new Input(shape: new Shape(10,10)));
+            //model.Add(new Conv2D(100,new Tuple<int, int>(5,5),activation: "tanh"));
+            model.Add(new Flatten());
+            model.Add(new Dense(100, activation: "tanh"));
+            model.Add(new Dense(100, activation: "tanh"));
+            model.Compile(optimizer: "sgd", loss: "binary_crossentropy", metrics: new string[] { "accuracy" });
+            model.Summary();
+            Model = model;
+            return model; 
         }
 
         public static void dataPreparation(out NDarray x,out NDarray y)
@@ -133,33 +129,46 @@ namespace project
 
         private static int AIPredict(int[,] Board, int index)
         {
-            List<float> resultL;
-            NDarray result;
-
             using (Py.GIL())
             {
+                List<float> resultL;
+                NDarray result;
+
                 if (Model == null) LoadModel();
                 result = Model.Predict(np.array(Board).reshape(1, 10, 10));
                 resultL = result.GetData<float>().ToList();
-            }
-            var resultSorted = resultL;
-            resultSorted.Sort();
-            var AImove = resultL.IndexOf(resultSorted[index]);
-            return AImove;
+
+
+                var resultSorted = new List<float>(resultL);
+                resultSorted.Sort();
+                resultSorted.Reverse();
+                var AImove = -1;
+                try
+                {
+                    AImove = resultL.IndexOf(resultSorted[index]);
+                }
+                catch (IndexOutOfRangeException)
+                {
+                    throw new GameIsOverException();
+                }
+            
+                return AImove;
+                }
+
         }
 
         public static void TrainModel()
         {
             using (Py.GIL())
             {
-                NDarray x;
-                NDarray y;
+                NDarray x,y;
                 dataPreparation(out x, out y);
                 LoadModel();
                 Model.Compile(optimizer: "sgd", loss: "binary_crossentropy", metrics: new string[] { "accuracy" });
                 if (Directory.GetFiles("data/journal").Any())
                 {
-                    Model.Fit(x, y, batch_size: 1, epochs: 10, verbose: 1);
+                    Console.WriteLine("Traning from {0} samples ", x.size);
+                    Model.Fit(x, y, batch_size: 5, epochs: 10000, verbose: 1);
                 }
                 
                 SaveModel();

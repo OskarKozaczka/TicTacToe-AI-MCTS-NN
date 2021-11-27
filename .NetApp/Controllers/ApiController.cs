@@ -33,7 +33,7 @@ namespace project.Controllers
 
         // POST api/GetMove/id
         [HttpPost("GetMove/{id}")]
-        public int GetMovePost(string id, [FromBody] MoveModel value)
+        public int GetMovePost(string id, [FromBody] Move value)
         {
             return GameManager.GamesDict[id].MakeMove(value);
         }

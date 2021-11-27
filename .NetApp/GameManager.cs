@@ -14,14 +14,7 @@ namespace project
 
         public static string CreateNewGame()
         {
-            Random rnd = new();
-            var Chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
-            StringBuilder sb = new();
-            for (int i = 0; i < 5; i++)
-            {
-                sb.Append(Chars[rnd.Next() % 61]);
-            }
-            var GameID = sb.ToString();
+            var GameID = RandomStringGenerator();
 
             try
             {
@@ -33,6 +26,20 @@ namespace project
             }
 
             return GameID;
+        }
+
+
+        public static string RandomStringGenerator()
+        {
+            Random rnd = new();
+            var Chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
+            StringBuilder sb = new();
+            for (int i = 0; i < 5; i++)
+            {
+                sb.Append(Chars[rnd.Next() % 61]);
+            }
+
+            return sb.ToString();
         }
 
     }
