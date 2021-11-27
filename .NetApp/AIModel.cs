@@ -38,8 +38,7 @@ namespace project
             //model.Add(new Conv2D(100,new Tuple<int, int>(5,5),activation: "tanh"));
             model.Add(new Flatten());
             model.Add(new Dense(100, activation: "tanh"));
-            model.Add(new Dense(100, activation: "tanh"));
-            model.Compile(optimizer: "sgd", loss: "binary_crossentropy", metrics: new string[] { "accuracy" });
+            model.Add(new Dense(100, activation: "softmax"));
             model.Summary();
             Model = model;
             return model; 
@@ -99,12 +98,15 @@ namespace project
                 var loadedModel = Sequential.ModelFromJson(File.ReadAllText("data/model/model.json"));
                 loadedModel.LoadWeight("data/model/model.h5");
                 Model = loadedModel;
-
             }
             catch
             {
                 Console.WriteLine("Model was not found, creating a new one");
                 Model = createModel();
+            }
+            finally
+            {
+                Model.Compile(optimizer: "sgd", loss: "categorical_crossentropy", metrics: new string[] { "accuracy" });
                 SaveModel();
             }
         }
@@ -164,11 +166,10 @@ namespace project
                 NDarray x,y;
                 dataPreparation(out x, out y);
                 LoadModel();
-                Model.Compile(optimizer: "sgd", loss: "binary_crossentropy", metrics: new string[] { "accuracy" });
                 if (Directory.GetFiles("data/journal").Any())
                 {
                     Console.WriteLine("Traning from {0} samples ", x.size);
-                    Model.Fit(x, y, batch_size: 5, epochs: 10000, verbose: 1);
+                    Model.Fit(x, y, batch_size: 5, epochs: 1000, verbose: 1);
                 }
                 
                 SaveModel();

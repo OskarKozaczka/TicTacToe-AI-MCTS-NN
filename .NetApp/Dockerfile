@@ -29,4 +29,4 @@ FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
 
-ENTRYPOINT ["dotnet", "project.dll""]
+ENTRYPOINT ["dotnet", "project.dll"]
