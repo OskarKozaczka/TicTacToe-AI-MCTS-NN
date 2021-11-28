@@ -14,6 +14,5 @@ export class StartComponent implements OnInit {
 
   CreateNewGame() {
     this.api.CreateNewGame();
-    
   }
 }

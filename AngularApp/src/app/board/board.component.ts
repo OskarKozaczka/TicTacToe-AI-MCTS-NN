@@ -64,10 +64,24 @@ export class BoardComponent implements OnInit {
     }
 
   }
+
+
 }
 
 @Component({
   selector: 'dialog-content-example-dialog',
   templateUrl: 'dialog-content-example-dialog.html',
 })
-export class DialogContentExampleDialog {}
+export class DialogContentExampleDialog {
+  constructor(private api: BackendService) {}
+
+  async CreateNewGame() {
+    this.api.CreateNewGame();
+    await this.delay(200);
+    window.location.reload();
+  }
+
+    delay(ms: number) {
+      return new Promise( resolve => setTimeout(resolve, ms) );
+  }
+}

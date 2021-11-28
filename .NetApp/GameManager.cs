@@ -22,7 +22,7 @@ namespace project
             }
             catch
             {
-                Console.WriteLine("Game with this ID already exists");
+                throw new GameAlreadyExistsException();
             }
 
             return GameID;

@@ -48,7 +48,7 @@ namespace project
             if (diagonal1 == 5) return true;
 
             var diagonal2 = 1;
-            for (int i = 1; i <= Math.Min(move.x, 10 - move.y); i++) if (Board[move.y + i, move.x - i] == 1) diagonal2++; else break; //down and left
+            for (int i = 1; i < Math.Min(move.x, 10 - move.y); i++) if (Board[move.y + i, move.x - i] == 1) diagonal2++; else break; //down and left
             for (int i = 1; i < Math.Min(10 - move.x, move.y); i++) if (Board[move.y - i, move.x + i] == 1) diagonal2++; else break; //up and right
             if (diagonal2 == 5) return true;
 
