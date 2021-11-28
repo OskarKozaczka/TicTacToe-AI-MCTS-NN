@@ -32,12 +32,25 @@ namespace project
 
         private bool CheckForWinner(Move move)
         {
-            //check horiizontal 
             var horizontal = 1;
-            for (int i = 1; i < move.x; i++) if (Board[move.y, move.x - i] == 1) horizontal++; else break;
-            for (int i = 1; i < 10-move.x; i++) if (Board[move.y, move.x + i] == 1) horizontal++; else break;
+            for (int i = 1; i < move.x; i++) if (Board[move.y, move.x - i] == 1) horizontal++; else break; //left
+            for (int i = 1; i < 10-move.x; i++) if (Board[move.y, move.x + i] == 1) horizontal++; else break; //right
             if(horizontal == 5) return true;
-            Console.WriteLine(horizontal);
+
+            var vertical = 1;
+            for (int i = 1; i < move.y; i++) if (Board[move.y - i, move.x ] == 1) vertical++; else break; //up
+            for (int i = 1; i < 10 - move.y; i++) if (Board[move.y + i, move.x ] == 1) vertical++; else break; //down
+            if (vertical == 5) return true;
+
+            var diagonal1 = 1;
+            for (int i = 1; i <= Math.Min(move.x,move.y); i++) if (Board[move.y - i, move.x - i] == 1) diagonal1++; else break; //up and left
+            for (int i = 1; i < Math.Min(10-move.x, 10-move.y); i++) if (Board[move.y + i, move.x + i] == 1) diagonal1++; else break; // down and right
+            if (diagonal1 == 5) return true;
+
+            var diagonal2 = 1;
+            for (int i = 1; i <= Math.Min(move.x, 10 - move.y); i++) if (Board[move.y + i, move.x - i] == 1) diagonal2++; else break; //down and left
+            for (int i = 1; i < Math.Min(10 - move.x, move.y); i++) if (Board[move.y - i, move.x + i] == 1) diagonal2++; else break; //up and right
+            if (diagonal2 == 5) return true;
 
             return false;
         }

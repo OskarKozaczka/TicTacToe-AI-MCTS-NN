@@ -19,13 +19,13 @@ export class BoardComponent implements OnInit {
     this.api.GetBoard(String(this.route.snapshot.paramMap.get('id'))).then(
       (res) => {
         this.Board = res;
-        this.createTable();
+        this.createBoard();
       },
       (error) => console.log('Error Getting the Table From Server:' + error)
     );
   }
 
-  public createTable() {
+  public createBoard() {
     var i = 0;
     for (var y = 0; y < 10; y += 1) {
       for (var x = 0; x < 10; x += 1) {
@@ -55,12 +55,11 @@ export class BoardComponent implements OnInit {
       var MoveX = el.getAttribute('x') ?? '';
       var MoveY = el.getAttribute('y') ?? '';
       var move = { x: MoveX, y: MoveY } as Move;
-      // console.log(el.getAttribute('x'));
       var id = await this.api.GetMoveFromApi(
         String(this.route.snapshot.paramMap.get('id')),
         move
       );
-      id.toString() === "game is over" ? this.dialog.open(DialogContentExampleDialog) : document.getElementById(id.toString())!.style.backgroundColor = 'green';
+      id === "game is over" ? this.dialog.open(DialogContentExampleDialog) : document.getElementById(id)!.style.backgroundColor = 'green';
       this.PlayerTurn = true;
     }
 

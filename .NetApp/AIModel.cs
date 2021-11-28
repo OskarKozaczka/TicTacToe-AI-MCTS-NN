@@ -169,7 +169,7 @@ namespace project
                 if (Directory.GetFiles("data/journal").Any())
                 {
                     Console.WriteLine("Traning from {0} samples ", x.size);
-                    Model.Fit(x, y, batch_size: 5, epochs: 100, verbose: 1);
+                    Model.Fit(x, y, batch_size: 5, epochs: 10, verbose: 1);
                 }
                 
                 SaveModel();
