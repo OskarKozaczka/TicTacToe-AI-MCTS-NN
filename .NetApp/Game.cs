@@ -22,11 +22,24 @@ namespace project
             
         }
 
-        public int MakeMove(Move move)
+        public object MakeMove(Move move)
         {
             WriteMoveToJournal(move);
             if (Board[move.y, move.x] == 0) Board[move.y, move.x] = 1; else throw new InvalidMoveException();
+            if (CheckForWinner(move)) return "game is over";
             return GetAIMove();
+        }
+
+        private bool CheckForWinner(Move move)
+        {
+            //check horiizontal 
+            var horizontal = 1;
+            for (int i = 1; i < move.x; i++) if (Board[move.y, move.x - i] == 1) horizontal++; else break;
+            for (int i = 1; i < 10-move.x; i++) if (Board[move.y, move.x + i] == 1) horizontal++; else break;
+            if(horizontal == 5) return true;
+            Console.WriteLine(horizontal);
+
+            return false;
         }
 
         public int[,] GetBoard()

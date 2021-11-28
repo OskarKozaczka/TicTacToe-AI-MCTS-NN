@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { BackendService } from '../backend.service';
 import { Move } from '../Move';
 import { ActivatedRoute } from '@angular/router';
+import {MatDialog} from '@angular/material/dialog';
 
 @Component({
   selector: 'app-board',
@@ -9,7 +10,7 @@ import { ActivatedRoute } from '@angular/router';
   styleUrls: ['./board.component.css'],
 })
 export class BoardComponent implements OnInit {
-  constructor(private api: BackendService, private route: ActivatedRoute) {}
+  constructor(private api: BackendService, private route: ActivatedRoute,public dialog: MatDialog) {}
 
   Board: Number[][] = [];
   PlayerTurn = true;
@@ -55,14 +56,19 @@ export class BoardComponent implements OnInit {
       var MoveY = el.getAttribute('y') ?? '';
       var move = { x: MoveX, y: MoveY } as Move;
       // console.log(el.getAttribute('x'));
-      this.api.MakeMoveOnBoard(MoveX, MoveY);
       var id = await this.api.GetMoveFromApi(
         String(this.route.snapshot.paramMap.get('id')),
         move
       );
-      document.getElementById(id.toString())!.style.backgroundColor = 'green';
+      id.toString() === "game is over" ? this.dialog.open(DialogContentExampleDialog) : document.getElementById(id.toString())!.style.backgroundColor = 'green';
       this.PlayerTurn = true;
     }
 
   }
 }
+
+@Component({
+  selector: 'dialog-content-example-dialog',
+  templateUrl: 'dialog-content-example-dialog.html',
+})
+export class DialogContentExampleDialog {}

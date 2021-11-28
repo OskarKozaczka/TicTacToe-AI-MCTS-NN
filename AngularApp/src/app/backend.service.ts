@@ -18,7 +18,7 @@ export class BackendService {
 
   async GetMoveFromApi(id: string, move: Move) {
     var url = GetMoveUrl + id;
-    return await this.http.post<number>(url, move).toPromise();
+    return await this.http.post(url, move,{ responseType: 'text' }).toPromise();
   }
 
   CreateNewGame() {
@@ -29,7 +29,7 @@ export class BackendService {
     );
   }
 
-  MakeMoveOnBoard(x: string, y: string) {}
+
 
   async GetBoard(id: string) {
     var url = GetBoardUrl + id;

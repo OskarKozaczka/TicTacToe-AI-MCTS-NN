@@ -9,6 +9,8 @@ import { BoardComponent } from './board/board.component';
 import { PlaceholderComponent } from './placeholder/placeholder.component';
 import { GameComponent } from './game/game.component';
 import { StartComponent } from './start/start.component';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { MatDialogModule } from '@angular/material/dialog';
 
 @NgModule({
   declarations: [
@@ -20,10 +22,12 @@ import { StartComponent } from './start/start.component';
     StartComponent
   ],
   imports: [
+    MatDialogModule,
     BrowserModule,
     AppRoutingModule,
     HttpClientModule,
     NgbModule,
+    BrowserAnimationsModule,
   ],
   providers: [],
   bootstrap: [AppComponent]
