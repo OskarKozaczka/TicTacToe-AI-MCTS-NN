@@ -12,6 +12,7 @@ export class BoardComponent implements OnInit {
   constructor(private api: BackendService, private route: ActivatedRoute) {}
 
   Board: Number[][] = [];
+  PlayerTurn = true;
 
   ngOnInit(): void {
     this.api.GetBoard(String(this.route.snapshot.paramMap.get('id'))).then(
@@ -46,16 +47,22 @@ export class BoardComponent implements OnInit {
 
   public async onsquareclick(e: MouseEvent) {
     var el = e.target as HTMLInputElement;
-    el.style.backgroundColor = 'red';
-    var MoveX = el.getAttribute('x') ?? '';
-    var MoveY = el.getAttribute('y') ?? '';
-    var move = { x: MoveX, y: MoveY } as Move;
-    // console.log(el.getAttribute('x'));
-    this.api.MakeMoveOnBoard(MoveX, MoveY);
-    var id = await this.api.GetMoveFromApi(
-      String(this.route.snapshot.paramMap.get('id')),
-      move
-    );
-    document.getElementById(id.toString())!.style.backgroundColor = 'green';
+    if (el.style.backgroundColor == "" && this.PlayerTurn == true)
+    {
+      this.PlayerTurn = false
+      el.style.backgroundColor = 'red';
+      var MoveX = el.getAttribute('x') ?? '';
+      var MoveY = el.getAttribute('y') ?? '';
+      var move = { x: MoveX, y: MoveY } as Move;
+      // console.log(el.getAttribute('x'));
+      this.api.MakeMoveOnBoard(MoveX, MoveY);
+      var id = await this.api.GetMoveFromApi(
+        String(this.route.snapshot.paramMap.get('id')),
+        move
+      );
+      document.getElementById(id.toString())!.style.backgroundColor = 'green';
+      this.PlayerTurn = true;
+    }
+
   }
 }
