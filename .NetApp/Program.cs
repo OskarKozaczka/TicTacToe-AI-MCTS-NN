@@ -16,10 +16,11 @@ namespace project
         public static void Main(string[] args)
         {
             Directory.CreateDirectory("data/journal");
+            Directory.CreateDirectory("data/DB");
             Directory.CreateDirectory("data/model");
             PythonEngine.Initialize();
             PythonEngine.BeginAllowThreads();
-            AIModel.TrainModel();
+            AIModel.LoadModel();
             CreateHostBuilder(args).Build().Run();
         }
 

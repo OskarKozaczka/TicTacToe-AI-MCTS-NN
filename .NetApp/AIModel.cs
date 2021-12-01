@@ -13,25 +13,28 @@ namespace project
 {
     public static class AIModel
     {
+
+        const int batch_size = 1;
+        const int epochs = 100;
+        const int verbose = 1;
+
+
         private static BaseModel Model;
-        private static NDarray test;
+        //private static NDarray test;
 
-        public static void start()
-        {
+        //public static void Start()
+        //{
+        //    dataPreparation(out NDarray x, out NDarray y);
+        //    createModel();
+        //    //model.Fit(x, y, batch_size: 1, epochs: 100, verbose: 1);
+        //    //SaveModel();
+        //    var journal = Directory.GetFiles("data/journal");
+        //    test = np.array(JsonConvert.DeserializeObject<int[,]>(File.ReadAllLines(journal[0])[0].Split(';')[0])).reshape(1, 10,10);
+        //    Console.WriteLine(Model.Predict(test));
 
-            NDarray x;
-            NDarray y;
-            dataPreparation(out x, out y);
-            createModel();
-            //model.Fit(x, y, batch_size: 1, epochs: 100, verbose: 1);
-            //SaveModel();
-            var journal = Directory.GetFiles("data/journal");
-            test = np.array(JsonConvert.DeserializeObject<int[,]>(File.ReadAllLines(journal[0])[0].Split(';')[0])).reshape(1, 10,10);
-            Console.WriteLine(Model.Predict(test));
+        //}
 
-        }
-
-        public static Sequential createModel()
+        public static Sequential CreateModel()
         {
             var model = new Sequential();
             model.Add(new Input(shape: new Shape(10,10)));
@@ -44,48 +47,51 @@ namespace project
             return model; 
         }
 
-        public static void dataPreparation(out NDarray x,out NDarray y)
-        {
-            var features = new List<NDarray>();
-            var labels = new List<NDarray>();
-            var emptyTable = new int[10, 10];
+        //public static void DataPreparation(out NDarray x,out NDarray y)
+        //{
+        //    var features = new List<NDarray>();
+        //    var labels = new List<NDarray>();
+        //    try
+        //    {
+        //        var journal = Directory.GetFiles("data/journal");
+        //        foreach (var entry in journal)
+        //        {
+        //            var lines = File.ReadAllLines(entry);
+        //            foreach (var line in lines)
+        //            {
+        //                if (!string.IsNullOrWhiteSpace(line))
+        //                {
+        //                    features.Add(np.array(JsonConvert.DeserializeObject<int[,]>(line.Split(';')[0])));
+        //                }
 
-            Array.Clear(emptyTable, 0, emptyTable.Length);
-            try
-            {
-                var journal = Directory.GetFiles("data/journal");
-                foreach (var entry in journal)
-                {
-                    var lines = File.ReadAllLines(entry);
-                    foreach (var line in lines)
-                    {
-                        if (!string.IsNullOrWhiteSpace(line))
-                        {
-                            features.Add(np.array(JsonConvert.DeserializeObject<int[,]>(line.Split(';')[0])));
-                            Move move = JsonConvert.DeserializeObject<Move>(line.Split(';')[1]);
-                            var copy = emptyTable.Clone() as int[,];
-                            copy[move.y, move.x] = 1;
-                            labels.Add(np.array(copy).reshape(100));
-                        }
-
-                    }
-                }
+        //            }
+        //        }
           
-            }
-            catch (FileNotFoundException e)
+        //    }
+        //    catch (FileNotFoundException e)
+        //    {
+        //        throw new FileNotFoundException("Journal is empty", e);
+        //    }
+        //    catch (Exception e)
+        //    {
+        //        throw new WrongDataException("There was error reading the journal", e);
+        //    }
+
+        //    x = np.array(features.ToArray());
+        //    y = np.array(labels.ToArray());
+        //}
+
+        public static void ConsumeMovesFromJournal(string gameID)
+        {
+            using (Py.GIL())
             {
-                throw new FileNotFoundException("Journal is empty", e);
+                var data = DataManager.ReadAndPrepareData(gameID);
+                Model.Fit(data.features, data.labels, batch_size: batch_size, epochs: epochs, verbose: verbose);
+                AIModel.SaveModel();
             }
-            catch (Exception e)
-            {
-                throw new WrongDataException("There was error reading the journal", e);
-            }
-            
-            x = np.array(features.ToArray());
-            y = np.array(labels.ToArray());
         }
 
-        public static void SaveModel()
+        static void SaveModel()
         {
             File.WriteAllText("data/model/model.json", Model.ToJson());
             Model.SaveWeight("data/model/model.h5");
@@ -93,22 +99,26 @@ namespace project
 
         public static void LoadModel()
         {
-            try
+            using (Py.GIL())
             {
-                var loadedModel = Sequential.ModelFromJson(File.ReadAllText("data/model/model.json"));
-                loadedModel.LoadWeight("data/model/model.h5");
-                Model = loadedModel;
+                try
+                {
+                    var loadedModel = Sequential.ModelFromJson(File.ReadAllText("data/model/model.json"));
+                    loadedModel.LoadWeight("data/model/model.h5");
+                    Model = loadedModel;
+                }
+                catch
+                {
+                    Console.WriteLine("Model was not found, creating a new one");
+                    Model = CreateModel();
+                }
+                finally
+                {
+                    Model.Compile(optimizer: "sgd", loss: "categorical_crossentropy", metrics: new string[] { "accuracy" });
+                    SaveModel();
+                }
             }
-            catch
-            {
-                Console.WriteLine("Model was not found, creating a new one");
-                Model = createModel();
-            }
-            finally
-            {
-                Model.Compile(optimizer: "sgd", loss: "categorical_crossentropy", metrics: new string[] { "accuracy" });
-                SaveModel();
-            }
+
         }
 
         public static int GetMove(int[,] Board)
@@ -129,18 +139,15 @@ namespace project
             return Move;
         }
 
-        private static int AIPredict(int[,] Board, int index)
+        static int AIPredict(int[,] Board, int index)
         {
             using (Py.GIL())
             {
                 List<float> resultL;
                 NDarray result;
 
-                if (Model == null) LoadModel();
                 result = Model.Predict(np.array(Board).reshape(1, 10, 10));
                 resultL = result.GetData<float>().ToList();
-
-
                 var resultSorted = new List<float>(resultL);
                 resultSorted.Sort();
                 resultSorted.Reverse();
@@ -159,23 +166,21 @@ namespace project
 
         }
 
-        public static void TrainModel()
-        {
-            using (Py.GIL())
-            {
-                NDarray x,y;
-                dataPreparation(out x, out y);
-                LoadModel();
-                if (Directory.GetFiles("data/journal").Any())
-                {
-                    Console.WriteLine("Traning from {0} samples ", x.size);
-                    Model.Fit(x, y, batch_size: 5, epochs: 10, verbose: 1);
-                }
+        //static void TrainModel()
+        //{
+        //    using (Py.GIL())
+        //    {
+        //        DataPreparation(out NDarray x, out NDarray y);
+        //        LoadModel();
+        //        if (Directory.GetFiles("data/journal").Any())
+        //        {
+        //            Console.WriteLine("Traning from {0} samples ", x.size);
+        //            Model.Fit(x, y, batch_size: batch_size, epochs: epochs, verbose: verbose);
+        //        }
                 
-                SaveModel();
-            }
-            
-        }
+        //        SaveModel();
+        //    }
+        //}
     }
 }
    

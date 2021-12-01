@@ -4,13 +4,14 @@ using System.Collections;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Text;
+using Newtonsoft.Json;
 
 namespace project
 {
     public class GameManager
     {
 
-        public static Dictionary<string,Game> GamesDict = new();
+        private static Dictionary<string,Game> GamesDict = new();
 
         public static string CreateNewGame()
         {
@@ -42,5 +43,19 @@ namespace project
             return sb.ToString();
         }
 
+        public static void DisposeGame(string gameID)
+        {
+            GamesDict.Remove(gameID);
+        }
+
+        public static string GetBoard(string id)
+        {
+            return JsonConvert.SerializeObject(GameManager.GamesDict[id].GetBoard());
+        }
+
+        public static object GetMove(string id, Move value)
+        {
+            return GamesDict[id].MakeMove(value);
+        }
     }
 }

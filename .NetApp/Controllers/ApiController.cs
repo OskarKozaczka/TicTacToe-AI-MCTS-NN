@@ -13,29 +13,17 @@ namespace project.Controllers
     [ApiController]
     public class ApiController : ControllerBase
     {
-        [HttpGet("StudioJajo")]
-        public string Get()
-        {
-            return "Co oni tam nadają";
-        }
-
-        [HttpGet("JakaMapaBedzieGrana")]
-        public string GetMap()
-        {
-            return "Dust 2";
-        }
-
         [HttpGet("GetBoard/{id}")]
         public string GetBoard(string id)
         {
-            return JsonConvert.SerializeObject(GameManager.GamesDict[id].GetBoard());
+            return GameManager.GetBoard(id);
         }
 
         // POST api/GetMove/id
         [HttpPost("GetMove/{id}")]
         public object GetMovePost(string id, [FromBody] Move value)
         {
-            return GameManager.GamesDict[id].MakeMove(value);
+            return GameManager.GetMove(id, value);
         }
 
         [HttpPost("CreateNewGame")]
