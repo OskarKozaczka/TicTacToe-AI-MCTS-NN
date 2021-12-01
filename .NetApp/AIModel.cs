@@ -34,7 +34,7 @@ namespace project
 
         //}
 
-        public static Sequential CreateModel()
+        public static void CreateModel()
         {
             var model = new Sequential();
             model.Add(new Input(shape: new Shape(10,10)));
@@ -42,9 +42,7 @@ namespace project
             model.Add(new Flatten());
             model.Add(new Dense(100, activation: "tanh"));
             model.Add(new Dense(100, activation: "softmax"));
-            model.Summary();
             Model = model;
-            return model; 
         }
 
         //public static void DataPreparation(out NDarray x,out NDarray y)
@@ -110,12 +108,13 @@ namespace project
                 catch
                 {
                     Console.WriteLine("Model was not found, creating a new one");
-                    Model = CreateModel();
+                    CreateModel();
                 }
                 finally
                 {
                     Model.Compile(optimizer: "sgd", loss: "categorical_crossentropy", metrics: new string[] { "accuracy" });
                     SaveModel();
+                    Model.Summary();
                 }
             }
 
