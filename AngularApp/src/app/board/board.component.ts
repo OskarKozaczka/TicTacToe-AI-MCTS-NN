@@ -77,7 +77,7 @@ export class DialogContentExampleDialog {
 
   async CreateNewGame() {
     this.api.CreateNewGame();
-    await this.delay(200);
+    await this.delay(800);
     window.location.reload();
   }
 
