@@ -8,7 +8,7 @@ namespace project
     public class GameManager
     {
 
-        private static Dictionary<string, Game> GamesDict = new();
+        private static readonly Dictionary<string, Game> GamesDict = new();
 
         public static string CreateNewGame()
         {
@@ -29,12 +29,12 @@ namespace project
 
         public static string RandomStringGenerator()
         {
+            const string Chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
             Random rnd = new();
-            var Chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
             StringBuilder sb = new();
             for (int i = 0; i < 5; i++)
             {
-                sb.Append(Chars[rnd.Next() % 61]);
+                sb.Append(Chars[rnd.Next(0,61)]);
             }
 
             return sb.ToString();

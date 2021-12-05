@@ -18,7 +18,7 @@ namespace project
             this.GameID = GameID;
             Board = new int[10,10];
             Array.Clear(Board, 0, Board.Length);
-            if (random.Next(1,3) == 1) Board[random.Next(0,9), random.Next(0, 9)] = -1;
+            if (random.Next(0,2) == 0) Board[random.Next(0,9), random.Next(0, 9)] = -1;
         }
 
         public object MakeMove(Move move)
