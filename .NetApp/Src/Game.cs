@@ -14,45 +14,53 @@ namespace project
 
         public Game(string GameID)
         {
+            var random = new Random();
             this.GameID = GameID;
-            Board = new int[10, 10];
+            Board = new int[10,10];
             Array.Clear(Board, 0, Board.Length);
-
+            var move = AIModel.GetMove(Board);
+            if (random.Next(1,3) == 1) Board[random.Next(0,9), random.Next(0, 9)] = -1;
         }
 
         public object MakeMove(Move move)
         {
             WriteMoveToJournal(move);
-            if (Board[move.Y, move.X] == 0) Board[move.Y, move.X] = 1; else throw new InvalidMoveException();
-            if (CheckForWinner(move))
+            if (Board[move.y, move.x] == 0) Board[move.y, move.x] = 1; else throw new InvalidMoveException();
+
+            var AIMove = new Move();
+            var AImoveInt = GetAIMove();
+            AIMove.y = AImoveInt / 10;
+            AIMove.x = AImoveInt % 10;
+
+            if (CheckForWinner(move, 1) || CheckForWinner(AIMove , -1)) 
             {
                 Thread thread = new(EndGame);
                 thread.Start();
                 return "game is over";
             }
-            return GetAIMove();
+            return AImoveInt;
         }
 
-        private bool CheckForWinner(Move move)
+        private bool CheckForWinner(Move move, int symbol)
         {
             var horizontal = 1;
-            for (int i = 1; i < move.X; i++) if (Board[move.Y, move.X - i] == 1) horizontal++; else break; //left
-            for (int i = 1; i < 10 - move.X; i++) if (Board[move.Y, move.X + i] == 1) horizontal++; else break; //right
-            if (horizontal == 5) return true;
+            for (int i = 1; i < move.x; i++) if (Board[move.y, move.x - i] == symbol) horizontal++; else break; //left
+            for (int i = 1; i < 10-move.x; i++) if (Board[move.y, move.x + i] == symbol) horizontal++; else break; //right
+            if(horizontal == 5) return true;
 
             var vertical = 1;
-            for (int i = 1; i <= move.Y; i++) if (Board[move.Y - i, move.X] == 1) vertical++; else break; //up
-            for (int i = 1; i < 10 - move.Y; i++) if (Board[move.Y + i, move.X] == 1) vertical++; else break; //down
+            for (int i = 1; i <= move.y; i++) if (Board[move.y - i, move.x ] == symbol) vertical++; else break; //up
+            for (int i = 1; i < 10 - move.y; i++) if (Board[move.y + i, move.x ] == symbol) vertical++; else break; //down
             if (vertical == 5) return true;
 
             var diagonal1 = 1;
-            for (int i = 1; i <= Min(move.X, move.Y); i++) if (Board[move.Y - i, move.X - i] == 1) diagonal1++; else break; //up and left
-            for (int i = 1; i < Min(10 - move.X, 10 - move.Y); i++) if (Board[move.Y + i, move.X + i] == 1) diagonal1++; else break; // down and right
+            for (int i = 1; i < Min(move.x,move.y); i++) if (Board[move.y - i, move.x - i] == symbol) diagonal1++; else break; //up and left
+            for (int i = 1; i < Min(10-move.x, 10-move.y); i++) if (Board[move.y + i, move.x + i] == symbol) diagonal1++; else break; // down and right
             if (diagonal1 == 5) return true;
 
             var diagonal2 = 1;
-            for (int i = 1; i <= Min(move.X, 10 - move.Y); i++) if (Board[move.Y + i, move.X - i] == 1) diagonal2++; else break; //down and left
-            for (int i = 1; i < Min(10 - move.X, move.Y); i++) if (Board[move.Y - i, move.X + i] == 1) diagonal2++; else break; //up and right
+            for (int i = 1; i < Min(move.x, 10 - move.y); i++) if (Board[move.y + i, move.x - i] == symbol) diagonal2++; else break; //down and left
+            for (int i = 1; i < Min(10 - move.x, move.y); i++) if (Board[move.y - i, move.x + i] == symbol) diagonal2++; else break; //up and right
             if (diagonal2 == 5) return true;
 
             return false;
