@@ -1,8 +1,8 @@
-﻿using System;
-using System.IO;
-using System.Collections.Generic;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using Numpy;
+using System;
+using System.Collections.Generic;
+using System.IO;
 
 namespace project
 {
@@ -21,7 +21,7 @@ namespace project
                     {
                         string board = line.Split(';')[0], move = line.Split(';')[1];
                         features.Add(np.array(JsonConvert.DeserializeObject<int[,]>(board)));
-                        labels.Add(np.array(moveToArray(JsonConvert.DeserializeObject<Move>(move))).reshape(100));
+                        labels.Add(np.array(MoveToArray(JsonConvert.DeserializeObject<Move>(move))).reshape(100));
                     }
                 }
             }
@@ -34,18 +34,18 @@ namespace project
                 throw new WrongDataException("There was error reading the journal", e);
             }
 
-            TraningData data = new TraningData();
+            TraningData data = new();
             data.features = np.array(features.ToArray());
             data.labels = np.array(labels.ToArray());
 
             return data;
         }
 
-        static int[,] moveToArray(Move move)
+        static int[,] MoveToArray(Move move)
         {
             var emptyTable = new int[10, 10]; Array.Clear(emptyTable, 0, emptyTable.Length);
             var copy = emptyTable.Clone() as int[,];
-            copy[move.y, move.x] = 1;
+            copy[move.Y, move.X] = 1;
             return copy;
         }
 
@@ -58,7 +58,7 @@ namespace project
             {
                 File.Move($"data/journal/{gameID}.txt", $"data/DB/{gameID}({index}).txt");
             }
-            catch(FileNotFoundException e)
+            catch (FileNotFoundException e)
             {
                 throw new FileNotFoundException("There is no game with given ID in journal", e);
             }

@@ -1,17 +1,14 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
-using System.Collections;
-using System.Linq;
-using System.Threading.Tasks;
 using System.Text;
-using Newtonsoft.Json;
 
 namespace project
 {
     public class GameManager
     {
 
-        private static Dictionary<string,Game> GamesDict = new();
+        private static Dictionary<string, Game> GamesDict = new();
 
         public static string CreateNewGame()
         {

@@ -1,13 +1,12 @@
-﻿using System;
-using System.IO;
-using System.Collections.Generic;
-using System.Linq;
-using Newtonsoft.Json;
-using Numpy;
-using Keras.Models;
+﻿using Keras;
 using Keras.Layers;
-using Keras;
+using Keras.Models;
+using Numpy;
 using Python.Runtime;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 
 namespace project
 {
@@ -37,7 +36,7 @@ namespace project
         public static void CreateModel()
         {
             var model = new Sequential();
-            model.Add(new Input(shape: new Shape(10,10)));
+            model.Add(new Input(shape: new Shape(10, 10)));
             //model.Add(new Conv2D(100,new Tuple<int, int>(5,5),activation: "tanh"));
             model.Add(new Flatten());
             model.Add(new Dense(100, activation: "tanh"));
@@ -64,7 +63,7 @@ namespace project
 
         //            }
         //        }
-          
+
         //    }
         //    catch (FileNotFoundException e)
         //    {
@@ -129,9 +128,9 @@ namespace project
                 }
             int Move = -1;
             var index = 0;
-            while(Move == -1 || Board[Move/10,Move%10] != 0 )
+            while (Move == -1 || Board[Move / 10, Move % 10] != 0)
             {
-                Move = AIPredict(Board,index);
+                Move = AIPredict(Board, index);
                 index++;
             }
 
@@ -159,9 +158,9 @@ namespace project
                 {
                     throw new GameIsOverException();
                 }
-            
+
                 return AImove;
-                }
+            }
 
         }
 
@@ -176,10 +175,10 @@ namespace project
         //            Console.WriteLine("Traning from {0} samples ", x.size);
         //            Model.Fit(x, y, batch_size: batch_size, epochs: epochs, verbose: verbose);
         //        }
-                
+
         //        SaveModel();
         //    }
         //}
     }
 }
-   
+
