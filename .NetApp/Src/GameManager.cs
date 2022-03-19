@@ -8,6 +8,9 @@ namespace project
     public class GameManager
     {
 
+        public const int BoardSize = 5;
+        public const int SymbolsInRow = 3;
+
         private static readonly Dictionary<string, Game> GamesDict = new();
 
         public static string CreateNewGame()

@@ -27,8 +27,8 @@ export class BoardComponent implements OnInit {
 
   public createBoard() {
     var i = 0;
-    for (var y = 0; y < 10; y += 1) {
-      for (var x = 0; x < 10; x += 1) {
+    for (var y = 0; y < 5; y += 1) {
+      for (var x = 0; x < 5; x += 1) {
         var div = document.createElement('div');
         div.className = 'square';
         div.setAttribute('id', i.toString());

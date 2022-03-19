@@ -8,10 +8,13 @@ namespace project
 {
     public class DataManager
     {
+
+        private readonly static int BoardSize = GameManager.BoardSize;
+
         internal static TraningData ReadAndPrepareData(string gameID)
         {
             List<NDarray> features = new(), labels = new();
-            var emptyArray = new int[10, 10]; Array.Clear(emptyArray, 0, emptyArray.Length);
+            var emptyArray = new int[BoardSize, BoardSize]; Array.Clear(emptyArray, 0, emptyArray.Length);
 
             try
             {
@@ -21,7 +24,7 @@ namespace project
                     {
                         string board = line.Split(';')[0], move = line.Split(';')[1];
                         features.Add(np.array(JsonConvert.DeserializeObject<int[,]>(board)));
-                        labels.Add(np.array(MoveToArray(JsonConvert.DeserializeObject<Move>(move))).reshape(100));
+                        labels.Add(np.array(MoveToArray(JsonConvert.DeserializeObject<Move>(move))).reshape(BoardSize * BoardSize));
                     }
                 }
             }
@@ -43,7 +46,7 @@ namespace project
 
         static int[,] MoveToArray(Move move)
         {
-            var emptyTable = new int[10, 10]; Array.Clear(emptyTable, 0, emptyTable.Length);
+            var emptyTable = new int[BoardSize, BoardSize]; Array.Clear(emptyTable, 0, emptyTable.Length);
             var copy = emptyTable.Clone() as int[,];
             copy[move.Y, move.X] = 1;
             return copy;
