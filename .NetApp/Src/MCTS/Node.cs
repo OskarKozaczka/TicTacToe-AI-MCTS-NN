@@ -51,12 +51,12 @@ namespace project.Src.MCTS
         {
             Random random = new Random();
 
-            var value = random.Next(children.Length);
-            while (children[value] is null)
+            var i = random.Next(children.Length);
+            while (children[i] is null)
             {
-                value = random.Next(children.Length);
+                i = random.Next(children.Length);
             }
-            return value;
+            return i;
         }
 
         internal void BackPropagate(List<Node> path, float value,int toPlay)

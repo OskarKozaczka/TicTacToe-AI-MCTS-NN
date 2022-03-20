@@ -54,26 +54,37 @@ namespace project
         public static bool CheckForWinner(int[,] Board, Move move, int symbol)
         {
             var horizontal = 1;
-            for (int i = 1; i < move.X; i++) if (Board[move.Y, move.X - i] == symbol) horizontal++; else break; //left
+            for (int i = 1; i <= move.X; i++) if (Board[move.Y, move.X - i] == symbol) horizontal++; else break; //left
             for (int i = 1; i < BoardSize-move.X; i++) if (Board[move.Y, move.X + i] == symbol) horizontal++; else break; //right
-            if(horizontal == SymbolsInRow) return true;
+            if(horizontal >= SymbolsInRow) return true;
 
             var vertical = 1;
             for (int i = 1; i <= move.Y; i++) if (Board[move.Y - i, move.X ] == symbol) vertical++; else break; //up
             for (int i = 1; i < BoardSize - move.Y; i++) if (Board[move.Y + i, move.X ] == symbol) vertical++; else break; //down
-            if (vertical == SymbolsInRow) return true;
+            if (vertical >= SymbolsInRow) return true;
 
             var diagonal1 = 1;
-            for (int i = 1; i < Min(move.X,move.Y); i++) if (Board[move.Y - i, move.X - i] == symbol) diagonal1++; else break; //up and left
-            for (int i = 1; i < Min(BoardSize-move.X, BoardSize-move.Y); i++) if (Board[move.Y + i, move.X + i] == symbol) diagonal1++; else break; // down and right
-            if (diagonal1 == SymbolsInRow) return true;
+            for (int i = 1; i <= Min(move.X, move.Y); i++) if (Board[move.Y - i, move.X - i] == symbol) diagonal1++; else break; //up and left
+            for (int i = 1; i < Min(BoardSize - move.X, BoardSize - move.Y); i++) if (Board[move.Y + i, move.X + i] == symbol) diagonal1++; else break; // down and right
+            if (diagonal1 >= SymbolsInRow) return true;
 
             var diagonal2 = 1;
-            for (int i = 1; i < Min(move.X, BoardSize - move.Y); i++) if (Board[move.Y + i, move.X - i] == symbol) diagonal2++; else break; //down and left
-            for (int i = 1; i < Min(BoardSize - move.X, move.Y); i++) if (Board[move.Y - i, move.X + i] == symbol) diagonal2++; else break; //up and right
-            if (diagonal2 == SymbolsInRow) return true;
+            for (int i = 1; i <= Min(move.X, BoardSize - move.Y -1); i++) if (Board[move.Y + i, move.X - i] == symbol) diagonal2++; else break; //down and left
+            for (int i = 1; i <= Min(BoardSize - move.X -1, move.Y); i++) if (Board[move.Y - i, move.X + i] == symbol) diagonal2++; else break; //up and right
+            if (diagonal2 >= SymbolsInRow) return true;
 
             return false;
+        }
+
+        public static bool CheckForDraw(int[,] Board)
+        {
+            var count = 0;
+            for (int y = 0; y < 5; y++)
+                for (int x = 0; x < 5; x++)
+                {
+                    if (Board[y, x] == 0) return false;
+                }
+            return true;
         }
 
         public int[,] GetBoard()
@@ -91,14 +102,21 @@ namespace project
         {
             //return AI.GetMove(Board.Clone() as int[,]);
             var _mcts = new mcts();
-            var root = _mcts.Run(Board.Clone() as int[,],-1, 2000);
-            var bestValue = 0;
+            var board = Board.Clone() as int[,];
+
+            for (int y = 0; y < 5; y++)
+                for (int x = 0; x < 5; x++)
+                {
+                    board[y, x] = board[y, x] * -1;
+                }
+            var root = _mcts.Run(board,1, 100000);
+            var bestValue = -100f;
             var bestMove = 0;
             foreach (var child in root.children)
             {
                 if (child is not null && child.value > bestValue)
                 {
-                    bestValue = (int)child.value;
+                    bestValue = child.value;
                     bestMove = Array.IndexOf(root.children, child);
                 }
             }

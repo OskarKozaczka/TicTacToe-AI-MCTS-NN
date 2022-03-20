@@ -9,7 +9,7 @@ namespace project
     {
 
         public const int BoardSize = 5;
-        public const int SymbolsInRow = 3;
+        public const int SymbolsInRow = 4;
 
         private static readonly Dictionary<string, Game> GamesDict = new();
 
