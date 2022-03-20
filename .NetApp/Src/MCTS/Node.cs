@@ -5,6 +5,8 @@ namespace project.Src.MCTS
 {
     public class Node
     {
+        const int boardSize = GameManager.BoardSize;
+
         internal int[,] board { get; set; }
         internal float valueSum { get; set; }
         internal int visitCount { get; set; }
@@ -32,9 +34,9 @@ namespace project.Src.MCTS
 
             var i = 0;
 
-            for (int x = 0; x < 5; x++)
+            for (int x = 0; x < boardSize; x++)
             {
-                for (int y = 0; y < 5; y++)
+                for (int y = 0; y < boardSize; y++)
                 {
                     if (board[x,y] == 0) possibilities.Add(i);
                     i++;
@@ -47,16 +49,18 @@ namespace project.Src.MCTS
 
 
 
-        internal int SelectChild()
+        internal Node SelectChild(out int action)
         {
             Random random = new Random();
 
-            var i = random.Next(children.Length);
-            while (children[i] is null)
+            var node = children[random.Next(children.Length)];
+            while (node is null)
             {
-                i = random.Next(children.Length);
+                node = children[random.Next(children.Length)];
             }
-            return i;
+
+            action = Array.IndexOf(children, node);
+            return node;
         }
 
         internal void BackPropagate(List<Node> path, float value,int toPlay)

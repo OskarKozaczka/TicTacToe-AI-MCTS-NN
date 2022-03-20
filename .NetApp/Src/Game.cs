@@ -28,15 +28,40 @@ namespace project
         {
             WriteMoveToJournal(move);
             if (Board[move.Y, move.X] == 0) Board[move.Y, move.X] = 1; else throw new InvalidMoveException();
+
+            if (CheckForWinner(Board, move, 1))
+                {
+                RunEndGame();
+                return "You won!";
+                }
+
+            if (CheckForDraw(Board))
+            {
+                RunEndGame();
+                return "Draw";
+            }
+
             var AImoveInt = MakeAIMove(out Move AIMove);
 
-            if (CheckForWinner(Board, move, 1) || CheckForWinner(Board, AIMove, -1))
+            if (CheckForWinner(Board, AIMove, -1))
             {
-                Thread thread = new(EndGame);
-                thread.Start();
-                return "game is over";
+                RunEndGame();
+                return "You Lost :(";
             }
             return AImoveInt;
+
+            if (CheckForDraw(Board))
+            {
+                RunEndGame();
+                return "Draw";
+            }
+
+            void RunEndGame(){
+
+            Thread thread = new(EndGame);
+            thread.Start();
+            }
+            
         }
 
         private int MakeAIMove(out Move AIMove)
@@ -53,34 +78,84 @@ namespace project
 
         public static bool CheckForWinner(int[,] Board, Move move, int symbol)
         {
-            var horizontal = 1;
-            for (int i = 1; i <= move.X; i++) if (Board[move.Y, move.X - i] == symbol) horizontal++; else break; //left
-            for (int i = 1; i < BoardSize-move.X; i++) if (Board[move.Y, move.X + i] == symbol) horizontal++; else break; //right
-            if(horizontal >= SymbolsInRow) return true;
+            //var horizontal = 1;
+            //for (int i = 1; i <= move.X; i++) if (Board[move.Y, move.X - i] == symbol) horizontal++; else break; //left
+            //for (int i = 1; i < BoardSize-move.X; i++) if (Board[move.Y, move.X + i] == symbol) horizontal++; else break; //right
+            //if(horizontal >= SymbolsInRow) return true;
 
-            var vertical = 1;
-            for (int i = 1; i <= move.Y; i++) if (Board[move.Y - i, move.X ] == symbol) vertical++; else break; //up
-            for (int i = 1; i < BoardSize - move.Y; i++) if (Board[move.Y + i, move.X ] == symbol) vertical++; else break; //down
-            if (vertical >= SymbolsInRow) return true;
+            //var vertical = 1;
+            //for (int i = 1; i <= move.Y; i++) if (Board[move.Y - i, move.X ] == symbol) vertical++; else break; //up
+            //for (int i = 1; i < BoardSize - move.Y; i++) if (Board[move.Y + i, move.X ] == symbol) vertical++; else break; //down
+            //if (vertical >= SymbolsInRow) return true;
 
-            var diagonal1 = 1;
-            for (int i = 1; i <= Min(move.X, move.Y); i++) if (Board[move.Y - i, move.X - i] == symbol) diagonal1++; else break; //up and left
-            for (int i = 1; i < Min(BoardSize - move.X, BoardSize - move.Y); i++) if (Board[move.Y + i, move.X + i] == symbol) diagonal1++; else break; // down and right
-            if (diagonal1 >= SymbolsInRow) return true;
+            //var diagonal1 = 1;
+            //for (int i = 1; i <= Min(move.X, move.Y); i++) if (Board[move.Y - i, move.X - i] == symbol) diagonal1++; else break; //up and left
+            //for (int i = 1; i < Min(BoardSize - move.X, BoardSize - move.Y); i++) if (Board[move.Y + i, move.X + i] == symbol) diagonal1++; else break; // down and right
+            //if (diagonal1 >= SymbolsInRow) return true;
 
-            var diagonal2 = 1;
-            for (int i = 1; i <= Min(move.X, BoardSize - move.Y -1); i++) if (Board[move.Y + i, move.X - i] == symbol) diagonal2++; else break; //down and left
-            for (int i = 1; i <= Min(BoardSize - move.X -1, move.Y); i++) if (Board[move.Y - i, move.X + i] == symbol) diagonal2++; else break; //up and right
-            if (diagonal2 >= SymbolsInRow) return true;
+            //var diagonal2 = 1;
+            //for (int i = 1; i <= Min(move.X, BoardSize - move.Y -1); i++) if (Board[move.Y + i, move.X - i] == symbol) diagonal2++; else break; //down and left
+            //for (int i = 1; i <= Min(BoardSize - move.X -1, move.Y); i++) if (Board[move.Y - i, move.X + i] == symbol) diagonal2++; else break; //up and right
+            //if (diagonal2 >= SymbolsInRow) return true;
+
+            //return false;
+
+            
+            for (int y = 0; y < BoardSize; y++)
+            {
+                var symbolCount = 0;
+                for (int x = 0; x < BoardSize; x++)
+                {
+                    if (Board[y, x] == symbol) symbolCount++; else symbolCount = 0;
+                    if (symbolCount >= SymbolsInRow) return true;
+                }
+            }
+
+            for (int x = 0; x < BoardSize; x++)
+            {
+                var symbolCount = 0;
+                for (int y = 0; y < BoardSize; y++)
+                {
+                    if (Board[y, x] == symbol) symbolCount++; else symbolCount = 0;
+                    if (symbolCount >= SymbolsInRow) return true;
+                }
+            }
+
+            for (int x = 0; x <= BoardSize-SymbolsInRow; x++)
+            {
+                for (int y = 0; y <= BoardSize - SymbolsInRow; y++)
+                {
+                    var symbolCount = 0;
+                    for (int i = 0; i < BoardSize-x-y; i++)
+                    {
+                        if (Board[y+i, x+i] == symbol) symbolCount++; else symbolCount = 0;
+                        if (symbolCount >= SymbolsInRow) return true;
+                    }
+
+                }
+            }
+
+            for (int x = 0; x <= BoardSize - SymbolsInRow; x++)
+            {
+                for (int y = BoardSize-1; y >= SymbolsInRow - 1; y--)
+                {
+                    var symbolCount = 0;
+                    for (int i = 0; i < BoardSize - x - (BoardSize - y -1); i++)
+                    {
+                        if (Board[y - i, x + i] == symbol) symbolCount++; else symbolCount = 0;
+                        if (symbolCount >= SymbolsInRow) return true;
+                    }
+
+                }
+            }
 
             return false;
         }
 
         public static bool CheckForDraw(int[,] Board)
         {
-            var count = 0;
-            for (int y = 0; y < 5; y++)
-                for (int x = 0; x < 5; x++)
+            for (int y = 0; y < BoardSize; y++)
+                for (int x = 0; x < BoardSize; x++)
                 {
                     if (Board[y, x] == 0) return false;
                 }
@@ -101,15 +176,15 @@ namespace project
         public int GetAIMove()
         {
             //return AI.GetMove(Board.Clone() as int[,]);
-            var _mcts = new mcts();
+            var _mcts = new MCTS();
             var board = Board.Clone() as int[,];
 
-            for (int y = 0; y < 5; y++)
-                for (int x = 0; x < 5; x++)
+            for (int y = 0; y < BoardSize; y++)
+                for (int x = 0; x < BoardSize; x++)
                 {
                     board[y, x] = board[y, x] * -1;
                 }
-            var root = _mcts.Run(board,1, 100000);
+            var root = _mcts.Run(board,1, 200000);
             var bestValue = -1f;
             var bestMove = 0;
             foreach (var child in root.children)
@@ -125,10 +200,10 @@ namespace project
 
         public void EndGame()
         {
-            AI.ConsumeMovesFromJournal(GameID);
-            DataManager.MoveGameToDB(GameID);
+          //  AI.ConsumeMovesFromJournal(GameID);
+          //  DataManager.MoveGameToDB(GameID);
             GameManager.DisposeGame(GameID);
-            AI.LoadModel();
+          //  AI.LoadModel();
         }
     }
 }

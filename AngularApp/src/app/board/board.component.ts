@@ -3,6 +3,8 @@ import { BackendService } from '../backend.service';
 import { Move } from '../Move';
 import { ActivatedRoute } from '@angular/router';
 import {MatDialog} from '@angular/material/dialog';
+import {MAT_DIALOG_DATA} from '@angular/material/dialog';
+import {Inject} from '@angular/core';
 
 @Component({
   selector: 'app-board',
@@ -59,7 +61,14 @@ export class BoardComponent implements OnInit {
         String(this.route.snapshot.paramMap.get('id')),
         move
       );
-      id === "game is over" ? this.dialog.open(DialogContentExampleDialog) : document.getElementById(id)!.style.backgroundColor = 'green';
+
+      if (id.length > 2)
+      {
+        this.dialog.open(DialogContentExampleDialog, {data: {message: id}})
+      }else
+      {
+        document.getElementById(id)!.style.backgroundColor = 'green'
+      }
       this.PlayerTurn = true;
     }
 
@@ -73,7 +82,7 @@ export class BoardComponent implements OnInit {
   templateUrl: 'dialog-content-example-dialog.html',
 })
 export class DialogContentExampleDialog {
-  constructor(private api: BackendService) {}
+  constructor(private api: BackendService,  @Inject(MAT_DIALOG_DATA) public data: {message: string}) {}
 
   async CreateNewGame() {
     this.api.CreateNewGame();

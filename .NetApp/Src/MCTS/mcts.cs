@@ -2,9 +2,9 @@
 
 namespace project.Src.MCTS
 {
-    public class mcts
+    public class MCTS
     {
-        const int boardSize = 5;
+        const int boardSize = GameManager.BoardSize;
 
         public Node Run(int[,] Board, int toPlay, int simNum)
         {
@@ -20,8 +20,7 @@ namespace project.Src.MCTS
 
                 while(node.isExpanded)
                 {
-                    action = node.SelectChild();
-                    node = node.children[action];
+                    node = node.SelectChild(out action);
                     path.Add(node);
                 }
                 var parent = path[^2];
@@ -29,8 +28,8 @@ namespace project.Src.MCTS
                 var nextBoard = board.Clone() as int[,];
                 nextBoard[action / boardSize , action % boardSize] = 1;
 
-                for (int y = 0; y < 5; y++)
-                    for (int x = 0; x < 5; x++)
+                for (int y = 0; y < boardSize; y++)
+                    for (int x = 0; x < boardSize; x++)
                     {
                         nextBoard[y, x] = nextBoard[y, x] * -1;
                     }
