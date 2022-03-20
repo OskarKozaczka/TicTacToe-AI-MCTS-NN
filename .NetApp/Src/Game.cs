@@ -110,7 +110,7 @@ namespace project
                     board[y, x] = board[y, x] * -1;
                 }
             var root = _mcts.Run(board,1, 100000);
-            var bestValue = -100f;
+            var bestValue = -1f;
             var bestMove = 0;
             foreach (var child in root.children)
             {

@@ -41,11 +41,11 @@ namespace project.Src.MCTS
                 Move.Y = action / boardSize;
                 if (Game.CheckForWinner(nextBoard, Move, 1))
                 {
-                    value = 1;
+                    value = -1;
                 }
                 else if (Game.CheckForWinner(nextBoard, Move, -1))
                 {
-                    value = -1;
+                    value = 1;
                 }
                 else if (Game.CheckForDraw(nextBoard))value = 0;
                 else value = null;
