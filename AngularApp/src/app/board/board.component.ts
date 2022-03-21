@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { BackendService } from '../backend.service';
 import { Move } from '../Move';
+import { MoveResponse } from '../MoveResponse';
 import { ActivatedRoute } from '@angular/router';
 import {MatDialog} from '@angular/material/dialog';
 import {MAT_DIALOG_DATA} from '@angular/material/dialog';
@@ -57,18 +58,11 @@ export class BoardComponent implements OnInit {
       var MoveX = el.getAttribute('x') ?? '';
       var MoveY = el.getAttribute('y') ?? '';
       var move = { x: MoveX, y: MoveY } as Move;
-      var id = await this.api.GetMoveFromApi(
-        String(this.route.snapshot.paramMap.get('id')),
-        move
-      );
-
-      if (id.length > 2)
-      {
-        this.dialog.open(DialogContentExampleDialog, {data: {message: id}})
-      }else
-      {
-        document.getElementById(id)!.style.backgroundColor = 'green'
-      }
+      var MoveResponse = await this.api.GetMoveFromApi(String(this.route.snapshot.paramMap.get('id')), move);
+      var id = MoveResponse.MoveID;
+      var gameStateMessage = MoveResponse.GameStateMessage;
+      document.getElementById(id.toString())!.style.backgroundColor = 'green'
+      if (gameStateMessage != "") this.dialog.open(DialogContentExampleDialog, {data: {message: gameStateMessage}})
       this.PlayerTurn = true;
     }
 

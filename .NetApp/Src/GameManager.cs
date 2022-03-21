@@ -50,7 +50,7 @@ namespace project
 
         public static string GetBoard(string id)
         {
-            return JsonConvert.SerializeObject(GameManager.GamesDict[id].GetBoard());
+            return JsonConvert.SerializeObject(GamesDict[id].GetBoard());
         }
 
         public static object GetMove(string id, Move value)

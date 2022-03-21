@@ -4,6 +4,7 @@ using System;
 using System.IO;
 using System.Threading;
 using static System.Math;
+using project.Models;
 
 namespace project
 {
@@ -21,40 +22,46 @@ namespace project
             this.GameID = GameID;
             Board = new int[BoardSize, BoardSize];
             Array.Clear(Board, 0, Board.Length);
-            if (random.Next(0, 2) == 0) MakeAIMove(out _);
+           // if (random.Next(0, 2) == 0) MakeAIMove(out _);
         }
 
         public object MakeMove(Move move)
         {
+            var moveResponse = new MoveResponseModel();
+
             WriteMoveToJournal(move);
             if (Board[move.Y, move.X] == 0) Board[move.Y, move.X] = 1; else throw new InvalidMoveException();
 
             if (CheckForWinner(Board, move, 1))
                 {
                 RunEndGame();
-                return "You won!";
-                }
+                moveResponse.GameStateMessage = "You won!";
+            }
 
             if (CheckForDraw(Board))
             {
                 RunEndGame();
-                return "Draw";
+                moveResponse.GameStateMessage = "Draw";
             }
 
-            var AImoveInt = MakeAIMove(out Move AIMove);
+            if (moveResponse.GameStateMessage != "") return moveResponse;
+
+            moveResponse.MoveID = MakeAIMove(out Move AIMove);
 
             if (CheckForWinner(Board, AIMove, -1))
             {
                 RunEndGame();
-                return "You Lost :(";
+                moveResponse.GameStateMessage = "You Lost :(";
             }
-            return AImoveInt;
+            
 
             if (CheckForDraw(Board))
             {
                 RunEndGame();
-                return "Draw";
+                moveResponse.GameStateMessage = "Draw";
             }
+
+            return JsonConvert.SerializeObject(moveResponse);
 
             void RunEndGame(){
 
@@ -184,7 +191,8 @@ namespace project
                 {
                     board[y, x] = board[y, x] * -1;
                 }
-            var root = _mcts.Run(board,1, 200000);
+
+            var root = _mcts.Run(board,1, 2000);
             var bestValue = -1f;
             var bestMove = 0;
             foreach (var child in root.children)

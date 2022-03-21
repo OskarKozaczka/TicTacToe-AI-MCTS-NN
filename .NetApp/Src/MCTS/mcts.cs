@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Diagnostics;
 
 namespace project.Src.MCTS
 {
@@ -6,12 +7,13 @@ namespace project.Src.MCTS
     {
         const int boardSize = GameManager.BoardSize;
 
-        public Node Run(int[,] Board, int toPlay, int simNum)
+        public Node Run(int[,] Board, int toPlay, int MaxTime)
         {
             var root = new Node(toPlay);
             root.Expand(Board, toPlay);
 
-            for (int i = 0; i < simNum; i++)
+            var stopwatch = Stopwatch.StartNew();
+            while(stopwatch.ElapsedMilliseconds <= MaxTime)
             {
                 var node = root;
                 var path = new List<Node> { node };
@@ -56,7 +58,7 @@ namespace project.Src.MCTS
                 }
                 node.BackPropagate(path, value.Value, parent.toPlay * -1);
             }
-
+            stopwatch.Stop();
             return root;
 
         }

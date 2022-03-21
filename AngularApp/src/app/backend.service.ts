@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Move } from './Move';
 import { Router } from '@angular/router';
+import { MoveResponse } from './MoveResponse';
 
 const GetMoveUrl = 'api/GetMove/';
 const CreateNewGameUrl = 'api/CreateNewGame';
@@ -18,7 +19,7 @@ export class BackendService {
 
   async GetMoveFromApi(id: string, move: Move) {
     var url = GetMoveUrl + id;
-    return await this.http.post(url, move,{ responseType: 'text' }).toPromise();
+    return await this.http.post<MoveResponse>(url, move).toPromise();
   }
 
   CreateNewGame() {
