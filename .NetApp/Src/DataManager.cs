@@ -3,6 +3,7 @@ using Numpy;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 
 namespace project
 {
@@ -22,9 +23,9 @@ namespace project
                 {
                     if (!string.IsNullOrWhiteSpace(line))
                     {
-                        string board = line.Split(';')[0], move = line.Split(';')[1];
+                        string board = line.Split(';')[0], result = line.Split(';')[1];
                         features.Add(np.array(JsonConvert.DeserializeObject<int[,]>(board)));
-                        labels.Add(np.array(MoveToArray(JsonConvert.DeserializeObject<Move>(move))).reshape(BoardSize * BoardSize));
+                        labels.Add(np.array(int.Parse(result)));
                     }
                 }
             }
@@ -44,12 +45,18 @@ namespace project
             return data;
         }
 
-        static int[,] MoveToArray(Move move)
+        internal static void WriteMoveToJournal(int[,] Board, string GameID)
         {
-            var emptyTable = new int[BoardSize, BoardSize]; Array.Clear(emptyTable, 0, emptyTable.Length);
-            var copy = emptyTable.Clone() as int[,];
-            copy[move.Y, move.X] = 1;
-            return copy;
+            File.AppendAllText($"data/journal/{GameID}.txt", JsonConvert.SerializeObject(Board) + ";\n");
+        }
+
+        internal static void UpdateGameResult(string GameID, int result)
+        {
+            var filePath = $"data/journal/{GameID}.txt";
+            var lines = File.ReadAllLines(filePath);
+            var newLines = lines.Select(line => line + result.ToString()).ToList();
+            File.Delete(filePath);
+            File.WriteAllLines(filePath, newLines);
         }
 
         internal static void MoveGameToDB(string gameID)
@@ -65,6 +72,13 @@ namespace project
             {
                 throw new FileNotFoundException("There is no game with given ID in journal", e);
             }
+        }
+        private static int[,] MoveToArray(Move move)
+        {
+            var emptyTable = new int[BoardSize, BoardSize]; Array.Clear(emptyTable, 0, emptyTable.Length);
+            var copy = emptyTable.Clone() as int[,];
+            copy[move.Y, move.X] = 1;
+            return copy;
         }
     }
 }

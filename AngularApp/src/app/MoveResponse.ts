@@ -1,4 +1,4 @@
 export interface MoveResponse {
-  MoveID: number;
-  GameStateMessage: String;
+  moveID: number;
+  gameStateMessage: String;
 }

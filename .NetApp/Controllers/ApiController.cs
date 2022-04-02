@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using project.Models;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -16,7 +17,7 @@ namespace project.Controllers
 
         // POST api/GetMove/id
         [HttpPost("GetMove/{id}")]
-        public object GetMovePost(string id, [FromBody] Move value)
+        public MoveResponseModel GetMovePost(string id, [FromBody] Move value)
         {
             return GameManager.GetMove(id, value);
         }

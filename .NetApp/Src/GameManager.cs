@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using project.Models;
 
 namespace project
 {
@@ -53,7 +54,7 @@ namespace project
             return JsonConvert.SerializeObject(GamesDict[id].GetBoard());
         }
 
-        public static object GetMove(string id, Move value)
+        public static MoveResponseModel GetMove(string id, Move value)
         {
             return GamesDict[id].MakeMove(value);
         }

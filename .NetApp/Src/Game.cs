@@ -25,22 +25,22 @@ namespace project
            // if (random.Next(0, 2) == 0) MakeAIMove(out _);
         }
 
-        public object MakeMove(Move move)
+        public MoveResponseModel MakeMove(Move move)
         {
             var moveResponse = new MoveResponseModel();
 
-            WriteMoveToJournal(move);
+            DataManager.WriteMoveToJournal(Board,GameID);
             if (Board[move.Y, move.X] == 0) Board[move.Y, move.X] = 1; else throw new InvalidMoveException();
 
-            if (CheckForWinner(Board, move, 1))
+            if (CheckForWinner(Board, 1))
                 {
-                RunEndGame();
+                RunEndGame(1);
                 moveResponse.GameStateMessage = "You won!";
             }
 
             if (CheckForDraw(Board))
             {
-                RunEndGame();
+                RunEndGame(0);
                 moveResponse.GameStateMessage = "Draw";
             }
 
@@ -48,25 +48,25 @@ namespace project
 
             moveResponse.MoveID = MakeAIMove(out Move AIMove);
 
-            if (CheckForWinner(Board, AIMove, -1))
+            if (CheckForWinner(Board, -1))
             {
-                RunEndGame();
+                RunEndGame(-1);
                 moveResponse.GameStateMessage = "You Lost :(";
             }
             
 
             if (CheckForDraw(Board))
             {
-                RunEndGame();
+                RunEndGame(0);
                 moveResponse.GameStateMessage = "Draw";
             }
 
-            return JsonConvert.SerializeObject(moveResponse);
+            return moveResponse;
 
-            void RunEndGame(){
+            void RunEndGame(int winner){
 
             Thread thread = new(EndGame);
-            thread.Start();
+            thread.Start(winner);
             }
             
         }
@@ -83,31 +83,8 @@ namespace project
             return AImoveInt;
         }
 
-        public static bool CheckForWinner(int[,] Board, Move move, int symbol)
+        public static bool CheckForWinner(int[,] Board, int symbol)
         {
-            //var horizontal = 1;
-            //for (int i = 1; i <= move.X; i++) if (Board[move.Y, move.X - i] == symbol) horizontal++; else break; //left
-            //for (int i = 1; i < BoardSize-move.X; i++) if (Board[move.Y, move.X + i] == symbol) horizontal++; else break; //right
-            //if(horizontal >= SymbolsInRow) return true;
-
-            //var vertical = 1;
-            //for (int i = 1; i <= move.Y; i++) if (Board[move.Y - i, move.X ] == symbol) vertical++; else break; //up
-            //for (int i = 1; i < BoardSize - move.Y; i++) if (Board[move.Y + i, move.X ] == symbol) vertical++; else break; //down
-            //if (vertical >= SymbolsInRow) return true;
-
-            //var diagonal1 = 1;
-            //for (int i = 1; i <= Min(move.X, move.Y); i++) if (Board[move.Y - i, move.X - i] == symbol) diagonal1++; else break; //up and left
-            //for (int i = 1; i < Min(BoardSize - move.X, BoardSize - move.Y); i++) if (Board[move.Y + i, move.X + i] == symbol) diagonal1++; else break; // down and right
-            //if (diagonal1 >= SymbolsInRow) return true;
-
-            //var diagonal2 = 1;
-            //for (int i = 1; i <= Min(move.X, BoardSize - move.Y -1); i++) if (Board[move.Y + i, move.X - i] == symbol) diagonal2++; else break; //down and left
-            //for (int i = 1; i <= Min(BoardSize - move.X -1, move.Y); i++) if (Board[move.Y - i, move.X + i] == symbol) diagonal2++; else break; //up and right
-            //if (diagonal2 >= SymbolsInRow) return true;
-
-            //return false;
-
-            
             for (int y = 0; y < BoardSize; y++)
             {
                 var symbolCount = 0;
@@ -174,12 +151,6 @@ namespace project
             return Board;
         }
 
-
-        public void WriteMoveToJournal(Move move)
-        {
-            File.AppendAllText($"data/journal/{GameID}.txt", JsonConvert.SerializeObject(Board) + ";" + JsonConvert.SerializeObject(move) + "\n");
-        }
-
         public int GetAIMove()
         {
             //return AI.GetMove(Board.Clone() as int[,]);
@@ -193,6 +164,7 @@ namespace project
                 }
 
             var root = _mcts.Run(board,1, 2000);
+            Console.WriteLine("Number of Simulations: " + root.visitCount);
             var bestValue = -1f;
             var bestMove = 0;
             foreach (var child in root.children)
@@ -206,12 +178,12 @@ namespace project
             return bestMove;
         }
 
-        public void EndGame()
+        public void EndGame(object Winner)
         {
-          //  AI.ConsumeMovesFromJournal(GameID);
-          //  DataManager.MoveGameToDB(GameID);
+            DataManager.UpdateGameResult(GameID, (int)Winner);
+            ValueNetwork.ConsumeMovesFromJournal(GameID);
+            DataManager.MoveGameToDB(GameID);
             GameManager.DisposeGame(GameID);
-          //  AI.LoadModel();
         }
     }
 }

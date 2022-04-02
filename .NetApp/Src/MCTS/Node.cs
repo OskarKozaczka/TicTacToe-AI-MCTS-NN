@@ -51,7 +51,7 @@ namespace project.Src.MCTS
 
         internal Node SelectChild(out int action)
         {
-            Random random = new Random();
+            Random random = new();
 
             var node = children[random.Next(children.Length)];
             while (node is null)

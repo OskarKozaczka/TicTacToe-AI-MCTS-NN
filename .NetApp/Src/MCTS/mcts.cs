@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Diagnostics;
+using System;
 
 namespace project.Src.MCTS
 {
@@ -11,7 +12,7 @@ namespace project.Src.MCTS
         {
             var root = new Node(toPlay);
             root.Expand(Board, toPlay);
-
+            var timer = new Stopwatch();
             var stopwatch = Stopwatch.StartNew();
             while(stopwatch.ElapsedMilliseconds <= MaxTime)
             {
@@ -40,20 +41,23 @@ namespace project.Src.MCTS
                 var Move = new Move();
                 Move.X = action % boardSize;
                 Move.Y = action / boardSize;
-                if (Game.CheckForWinner(nextBoard, Move, 1))
+                if (Game.CheckForWinner(nextBoard, 1))
                 {
                     value = -1;
                 }
-                else if (Game.CheckForWinner(nextBoard, Move, -1))
+                else if (Game.CheckForWinner(nextBoard, -1))
                 {
                     value = 1;
                 }
-                else if (Game.CheckForDraw(nextBoard))value = 0;
+                else if (Game.CheckForDraw(nextBoard)) value = 0;
                 else value = null;
 
                 if (value is null)
                 {
-                    value = 0;
+                    
+                    timer.Restart();
+                    value = ValueNetwork.MakePrediction(board) * -1;
+                    //Console.WriteLine(timer.ElapsedMilliseconds);
                     node.Expand(nextBoard, parent.toPlay * -1);
                 }
                 node.BackPropagate(path, value.Value, parent.toPlay * -1);

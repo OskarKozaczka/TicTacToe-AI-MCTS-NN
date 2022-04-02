@@ -14,7 +14,7 @@ namespace project
             Directory.CreateDirectory("data/model");
             PythonEngine.Initialize();
             PythonEngine.BeginAllowThreads();
-            AI.LoadModel();
+            ValueNetwork.LoadModel();
             CreateHostBuilder(args).Build().Run();
         }
 
