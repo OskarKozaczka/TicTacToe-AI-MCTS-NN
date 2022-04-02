@@ -61,13 +61,8 @@ export class BoardComponent implements OnInit {
       var MoveResponse = await this.api.GetMoveFromApi(String(this.route.snapshot.paramMap.get('id')), move);
       console.log(MoveResponse);
       var id = MoveResponse.moveID;
-       var gameStateMessage = MoveResponse.gameStateMessage;
-      if (gameStateMessage != "")
-      {
-        this.dialog.open(DialogContentExampleDialog, {data: {message: gameStateMessage}})
-        return
-      } 
-      document.getElementById(id.toString())!.style.backgroundColor = 'green'
+      var gameStateMessage = MoveResponse.gameStateMessage;
+      if (id >= 0) document.getElementById(id.toString())!.style.backgroundColor = 'green'
       if (gameStateMessage != "") this.dialog.open(DialogContentExampleDialog, {data: {message: gameStateMessage}})
       this.PlayerTurn = true;
     }

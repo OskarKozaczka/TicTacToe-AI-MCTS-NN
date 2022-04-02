@@ -23,9 +23,20 @@ namespace project
                 {
                     if (!string.IsNullOrWhiteSpace(line))
                     {
-                        string board = line.Split(';')[0], result = line.Split(';')[1];
-                        features.Add(np.array(JsonConvert.DeserializeObject<int[,]>(board)));
-                        labels.Add(np.array(int.Parse(result)));
+                        var board = JsonConvert.DeserializeObject<int[,]>(line.Split(';')[0]);
+                        var result = int.Parse(line.Split(';')[1]);
+
+                        features.Add(np.array(board));
+                        labels.Add(np.array(result));
+
+                        for (int y = 0; y < BoardSize; y++)
+                            for (int x = 0; x < BoardSize; x++)
+                            {
+                                board[y, x] = board[y, x] * -1;
+                            }
+                        features.Add(np.array(board));
+                        labels.Add(np.array(-result));
+
                     }
                 }
             }

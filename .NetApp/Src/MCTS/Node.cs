@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace project.Src.MCTS
 {
@@ -53,12 +54,8 @@ namespace project.Src.MCTS
         {
             Random random = new();
 
-            var node = children[random.Next(children.Length)];
-            while (node is null)
-            {
-                node = children[random.Next(children.Length)];
-            }
-
+            var filteredChilds = children.Where(child => child is not null).ToArray();
+            var node = filteredChilds[random.Next(filteredChilds.Length)];
             action = Array.IndexOf(children, node);
             return node;
         }
