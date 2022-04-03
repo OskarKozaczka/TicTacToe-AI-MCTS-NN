@@ -14,7 +14,7 @@
                 var draw = 0;
                 for (int i = 0; i < runs; i++)
                 {
-                    var game = new Game(GameManager.RandomStringGenerator(), MaxTime: 100);
+                    var game = new Game(GameManager.RandomStringGenerator(), MaxTime: 300);
                     while (true)
                     {
                         var Move = new Move();

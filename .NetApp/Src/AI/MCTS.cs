@@ -55,7 +55,6 @@ namespace project.Src.MCTS
                 if (value is null)
                 {
                     value = useNetowork ? -ValueNetwork.MakePrediction(nextBoard)/10 : 0;
-                    //Console.WriteLine(timer.ElapsedMilliseconds);
                     node.Expand(nextBoard, -parent.toPlay);
                 }
                 node.BackPropagate(path, value.Value, parent.toPlay * -1);

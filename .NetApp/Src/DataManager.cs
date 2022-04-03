@@ -29,13 +29,13 @@ namespace project
                         features.Add(np.array(board));
                         labels.Add(np.array(result));
 
-                        for (int y = 0; y < BoardSize; y++)
-                            for (int x = 0; x < BoardSize; x++)
-                            {
-                                board[y, x] = board[y, x] * -1;
-                            }
-                        features.Add(np.array(board));
-                        labels.Add(np.array(-result));
+                        //for (int y = 0; y < BoardSize; y++)
+                        //    for (int x = 0; x < BoardSize; x++)
+                        //    {
+                        //        board[y, x] = board[y, x] * -1;
+                        //    }
+                        //features.Add(np.array(board));
+                        //labels.Add(np.array(-result));
 
                     }
                 }
@@ -49,6 +49,34 @@ namespace project
                 throw new WrongDataException("There was error reading the journal", e);
             }
 
+            TraningData data = new();
+            data.features = np.array(features.ToArray());
+            data.labels = np.array(labels.ToArray());
+
+            return data;
+        }
+
+        internal static TraningData ReadAndPrepareDataFromDB()
+        {
+            List<NDarray> features = new(), labels = new();
+            var emptyArray = new int[BoardSize, BoardSize]; Array.Clear(emptyArray, 0, emptyArray.Length);
+
+            try
+            {
+                foreach (var file in Directory.EnumerateFiles($"data/DB"))
+                    foreach (var line in File.ReadAllLines(file))
+                    {
+                        if (!string.IsNullOrWhiteSpace(line))
+                        {
+                            var board = JsonConvert.DeserializeObject<int[,]>(line.Split(';')[0]);
+                            var result = int.Parse(line.Split(';')[1]);
+
+                            features.Add(np.array(board));
+                            labels.Add(np.array(result));
+                        }
+                    }
+            }
+            catch (Exception e) { }
             TraningData data = new();
             data.features = np.array(features.ToArray());
             data.labels = np.array(labels.ToArray());

@@ -185,7 +185,7 @@ namespace project
         {
             //Console.WriteLine((int)Winner);
             DataManager.UpdateGameResult(GameID, (int)Winner);
-            ValueNetwork.ConsumeMovesFromJournal(GameID);
+            //ValueNetwork.ConsumeMovesFromJournal(GameID);
             DataManager.MoveGameToDB(GameID);
             GameManager.DisposeGame(GameID);
             //ValueNetwork.LoadModel();

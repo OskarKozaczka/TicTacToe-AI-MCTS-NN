@@ -16,8 +16,8 @@ namespace project
 
         const int batch_size = 100;
         const int epochs = 100;
-        const int verbose = 0;
-        const int layers = 10;
+        const int verbose = 2;
+        const int layers = 4;
 
         private static BaseModel Model;
         public static void CreateModel()
@@ -26,13 +26,13 @@ namespace project
             model.Add(new Input(shape: new Shape(5, 5, 1)));
             for (int i = 0; i < layers; i++)
             {
-                model.Add(new Conv2D(128, (3, 3).ToTuple(), activation: "tanh", padding: "same", data_format: "channels_last", kernel_regularizer:"l2"));
+                model.Add(new Conv2D(64, (3, 3).ToTuple(), activation: "relu", padding: "same", data_format: "channels_last", kernel_regularizer:"l2"));
                 model.Add(new BatchNormalization());
             }
-            model.Add(new Conv2D(1, (1, 1).ToTuple(), activation: "tanh", padding: "same", data_format: "channels_last", kernel_regularizer: "l2"));
+            model.Add(new Conv2D(1, (1, 1).ToTuple(), activation: "relu", padding: "same", data_format: "channels_last", kernel_regularizer: "l2"));
             model.Add(new BatchNormalization());
             model.Add(new Flatten());
-            model.Add(new Dense(128, activation: "tanh"));
+            model.Add(new Dense(64, activation: "relu"));
             model.Add(new Dense(1, activation: "tanh"));
             model.Summary();
             Model = model;
@@ -44,6 +44,16 @@ namespace project
             {
                 var data = DataManager.ReadAndPrepareData(gameID);
                 Model.Fit(data.features, data.labels, batch_size: batch_size, epochs: epochs, verbose: verbose,validation_split: 0.1f);
+                SaveModel();
+            }
+        }
+
+        public static void ConsumeMovesFromDB()
+        {
+            using (Py.GIL())
+            {
+                var data = DataManager.ReadAndPrepareDataFromDB();
+                Model.Fit(data.features, data.labels, batch_size: batch_size, epochs: epochs, verbose: verbose, validation_split: 0.1f);
                 SaveModel();
             }
         }

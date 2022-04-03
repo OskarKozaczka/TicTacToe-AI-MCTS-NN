@@ -22,7 +22,8 @@ namespace project
             PythonEngine.Initialize();
             PythonEngine.BeginAllowThreads();
             ValueNetwork.LoadModel();
-            SelfPlay.Run(30);
+            ValueNetwork.ConsumeMovesFromDB();
+            SelfPlay.Run(10);
             CreateHostBuilder(args).Build().Run();
         }
 
