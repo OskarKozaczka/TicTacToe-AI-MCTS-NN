@@ -8,11 +8,17 @@ namespace project.Src.MCTS
     {
         const int boardSize = GameManager.BoardSize;
 
+        private bool useNetowork;
+
+        public MCTS(bool useNetowork = false)
+        {
+            this.useNetowork = useNetowork;
+        }
+
         public Node Run(int[,] Board, int toPlay, int MaxTime)
         {
             var root = new Node(toPlay);
             root.Expand(Board, toPlay);
-            var timer = new Stopwatch();
             var stopwatch = Stopwatch.StartNew();
             while(stopwatch.ElapsedMilliseconds <= MaxTime)
             {
@@ -41,24 +47,16 @@ namespace project.Src.MCTS
                 var Move = new Move();
                 Move.X = action % boardSize;
                 Move.Y = action / boardSize;
-                if (Game.CheckForWinner(nextBoard, 1))
-                {
-                    value = -1;
-                }
-                else if (Game.CheckForWinner(nextBoard, -1))
-                {
-                    value = 1;
-                }
+                if (Game.CheckForWinner(nextBoard, 1)) value = -1;
+                else if (Game.CheckForWinner(nextBoard, -1)) value = 1;
                 else if (Game.CheckForDraw(nextBoard)) value = 0;
                 else value = null;
 
                 if (value is null)
                 {
-                    
-                    timer.Restart();
-                    value = ValueNetwork.MakePrediction(board) * -1;
+                    value = useNetowork ? -ValueNetwork.MakePrediction(nextBoard)/10 : 0;
                     //Console.WriteLine(timer.ElapsedMilliseconds);
-                    node.Expand(nextBoard, parent.toPlay * -1);
+                    node.Expand(nextBoard, -parent.toPlay);
                 }
                 node.BackPropagate(path, value.Value, parent.toPlay * -1);
             }

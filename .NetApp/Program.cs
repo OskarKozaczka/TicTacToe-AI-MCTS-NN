@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
+using project.Src;
 using Python.Runtime;
 using System.IO;
 
@@ -15,6 +16,7 @@ namespace project
             PythonEngine.Initialize();
             PythonEngine.BeginAllowThreads();
             ValueNetwork.LoadModel();
+            //SelfPlay.Run(1000);
             CreateHostBuilder(args).Build().Run();
         }
 

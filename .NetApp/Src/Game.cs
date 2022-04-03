@@ -13,11 +13,17 @@ namespace project
         public const int BoardSize  = GameManager.BoardSize;  
         private const int SymbolsInRow = GameManager.SymbolsInRow;
 
+        int MaxTime { get; set; }
+        bool useNetwork { get; set; }
+
         public string GameID { get; set; }
         public int[,] Board { get; set; }
 
-        public Game(string GameID)
+        public Game(string GameID, bool useNetwork = true, int MaxTime = 2000)
         {
+            this.MaxTime = MaxTime;
+            this.useNetwork = useNetwork;
+
             var random = new Random();
             this.GameID = GameID;
             Board = new int[BoardSize, BoardSize];
@@ -29,8 +35,8 @@ namespace project
         {
             var moveResponse = new MoveResponseModel();
 
-            DataManager.WriteMoveToJournal(Board,GameID);
             if (Board[move.Y, move.X] == 0) Board[move.Y, move.X] = 1; else throw new InvalidMoveException();
+            DataManager.WriteMoveToJournal(Board, GameID);
 
             if (CheckForWinner(Board, 1))
                 {
@@ -71,7 +77,7 @@ namespace project
             
         }
 
-        private int MakeAIMove(out Move AIMove)
+        public int MakeAIMove(out Move AIMove)
         {
             AIMove = new Move();
             var AImoveInt = GetAIMove();
@@ -154,7 +160,7 @@ namespace project
         public int GetAIMove()
         {
             //return AI.GetMove(Board.Clone() as int[,]);
-            var _mcts = new MCTS();
+            var _mcts = new MCTS(useNetwork);
             var board = Board.Clone() as int[,];
 
             for (int y = 0; y < BoardSize; y++)
@@ -163,7 +169,7 @@ namespace project
                     board[y, x] = board[y, x] * -1;
                 }
 
-            var root = _mcts.Run(board,1, 2000);
+            var root = _mcts.Run(board,1, MaxTime);
             Console.WriteLine("Number of Simulations: " + root.visitCount);
             var bestValue = -1f;
             var bestMove = 0;
@@ -184,6 +190,7 @@ namespace project
             ValueNetwork.ConsumeMovesFromJournal(GameID);
             DataManager.MoveGameToDB(GameID);
             GameManager.DisposeGame(GameID);
+            ValueNetwork.LoadModel();
         }
     }
 }
