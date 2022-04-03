@@ -14,15 +14,12 @@ namespace project
         private const int SymbolsInRow = GameManager.SymbolsInRow;
 
         int MaxTime { get; set; }
-        bool useNetwork { get; set; }
-
         public string GameID { get; set; }
         public int[,] Board { get; set; }
 
-        public Game(string GameID, bool useNetwork = true, int MaxTime = 2000)
+        public Game(string GameID, int MaxTime = 2000)
         {
             this.MaxTime = MaxTime;
-            this.useNetwork = useNetwork;
 
             var random = new Random();
             this.GameID = GameID;
@@ -157,7 +154,7 @@ namespace project
             return Board;
         }
 
-        public int GetAIMove()
+        public int GetAIMove(bool useNetwork = false)
         {
             //return AI.GetMove(Board.Clone() as int[,]);
             var _mcts = new MCTS(useNetwork);
@@ -170,7 +167,7 @@ namespace project
                 }
 
             var root = _mcts.Run(board,1, MaxTime);
-            Console.WriteLine("Number of Simulations: " + root.visitCount);
+            //Console.WriteLine("Number of Simulations: " + root.visitCount);
             var bestValue = -1f;
             var bestMove = 0;
             foreach (var child in root.children)
@@ -186,11 +183,12 @@ namespace project
 
         public void EndGame(object Winner)
         {
+            //Console.WriteLine((int)Winner);
             DataManager.UpdateGameResult(GameID, (int)Winner);
             ValueNetwork.ConsumeMovesFromJournal(GameID);
             DataManager.MoveGameToDB(GameID);
             GameManager.DisposeGame(GameID);
-            ValueNetwork.LoadModel();
+            //ValueNetwork.LoadModel();
         }
     }
 }

@@ -6,19 +6,45 @@
         public const int BoardSize = GameManager.BoardSize;
         public static void Run(int runs)
         {
-            for (int i = 0; i < runs; i++)
+
+            while (true)
             {
-                var game = new Game(GameManager.RandomStringGenerator(),useNetwork: false, MaxTime: 100);
-                while (!Game.CheckForWinner(game.Board, 1) && !Game.CheckForWinner(game.Board, -1) && !Game.CheckForDraw(game.Board))
+                var win = 0;
+                var loss = 0;
+                var draw = 0;
+                for (int i = 0; i < runs; i++)
                 {
-                    var Move = new Move();
-                    var AImoveInt = game.GetAIMove();
+                    var game = new Game(GameManager.RandomStringGenerator(), MaxTime: 100);
+                    while (true)
+                    {
+                        var Move = new Move();
+                        var AImoveInt = game.GetAIMove(true);
 
-                    Move.Y = AImoveInt / BoardSize;
-                    Move.X = AImoveInt % BoardSize;
+                        Move.Y = AImoveInt / BoardSize;
+                        Move.X = AImoveInt % BoardSize;
 
-                    game.MakeMove(Move);
+                        game.MakeMove(Move);
+
+                        if (Game.CheckForWinner(game.Board, 1))
+                        {
+                            win++;
+                            break;
+                        }
+
+                        if (Game.CheckForWinner(game.Board, -1))
+                        {
+                            loss++;
+                            break;
+                        }
+                        if (Game.CheckForDraw(game.Board))
+                        {
+                            draw++;
+                            break;
+                        }
+                    }
                 }
+                Console.WriteLine("win:{0}, loss:{1}, draw:{2}", win, loss, draw);
+                ValueNetwork.LoadModel();
             }
         }
     }
