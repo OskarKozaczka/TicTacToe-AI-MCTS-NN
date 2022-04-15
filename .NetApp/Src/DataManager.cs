@@ -10,12 +10,12 @@ namespace project
     public class DataManager
     {
 
-        private readonly static int BoardSize = GameManager.BoardSize;
+        private readonly static int boardSize = GameManager.BoardSize;
 
         internal static TraningData ReadAndPrepareData(string gameID)
         {
             List<NDarray> features = new(), labels = new();
-            var emptyArray = new int[BoardSize, BoardSize]; Array.Clear(emptyArray, 0, emptyArray.Length);
+            var emptyArray = new int[boardSize, boardSize]; Array.Clear(emptyArray, 0, emptyArray.Length);
 
             try
             {
@@ -29,8 +29,8 @@ namespace project
                         features.Add(np.array(board));
                         labels.Add(np.array(result));
 
-                        //for (int y = 0; y < BoardSize; y++)
-                        //    for (int x = 0; x < BoardSize; x++)
+                        //for (int y = 0; y < boardSize; y++)
+                        //    for (int x = 0; x < boardSize; x++)
                         //    {
                         //        board[y, x] = board[y, x] * -1;
                         //    }
@@ -59,7 +59,7 @@ namespace project
         internal static TraningData ReadAndPrepareDataFromDB()
         {
             List<NDarray> features = new(), labels = new();
-            var emptyArray = new int[BoardSize, BoardSize]; Array.Clear(emptyArray, 0, emptyArray.Length);
+            var emptyArray = new int[boardSize, boardSize]; Array.Clear(emptyArray, 0, emptyArray.Length);
 
             try
             {
@@ -69,9 +69,22 @@ namespace project
                         if (!string.IsNullOrWhiteSpace(line))
                         {
                             var board = JsonConvert.DeserializeObject<int[,]>(line.Split(';')[0]);
+
+                            var myBoard = new int[boardSize, boardSize];
+                            var enemyBoard = new int[boardSize, boardSize];
+
+                            for (int y = 0; y < boardSize; y++)
+                                for (int x = 0; x < boardSize; x++)
+                                {
+                                    if (board[y, x] == 1) myBoard[y, x] = 1;
+                                    else if (board[y, x] == -1) enemyBoard[y, x] = 1;
+                                }
+
                             var result = int.Parse(line.Split(';')[1]);
 
-                            features.Add(np.array(board));
+                            if (result==0) continue;
+
+                            features.Add(np.array(new NDarray[] {myBoard,enemyBoard}));
                             labels.Add(np.array(result));
                         }
                     }
@@ -114,7 +127,7 @@ namespace project
         }
         private static int[,] MoveToArray(Move move)
         {
-            var emptyTable = new int[BoardSize, BoardSize]; Array.Clear(emptyTable, 0, emptyTable.Length);
+            var emptyTable = new int[boardSize, boardSize]; Array.Clear(emptyTable, 0, emptyTable.Length);
             var copy = emptyTable.Clone() as int[,];
             copy[move.Y, move.X] = 1;
             return copy;

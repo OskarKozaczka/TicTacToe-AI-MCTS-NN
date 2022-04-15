@@ -14,25 +14,23 @@ namespace project
     public class ValueNetwork
     {
 
-        const int batch_size = 100;
-        const int epochs = 100;
+        const int batch_size = 10;
+        const int epochs = 500;
         const int verbose = 2;
-        const int layers = 4;
+        const int layers = 3;
+        public const int boardSize = GameManager.BoardSize;
 
         private static BaseModel Model;
         public static void CreateModel()
         {
             var model = new Sequential();
-            model.Add(new Input(shape: new Shape(5, 5, 1)));
-            for (int i = 0; i < layers; i++)
-            {
-                model.Add(new Conv2D(64, (3, 3).ToTuple(), activation: "relu", padding: "same", data_format: "channels_last", kernel_regularizer:"l2"));
-                model.Add(new BatchNormalization());
-            }
-            model.Add(new Conv2D(1, (1, 1).ToTuple(), activation: "relu", padding: "same", data_format: "channels_last", kernel_regularizer: "l2"));
-            model.Add(new BatchNormalization());
+            model.Add(new Input(shape: new Shape(2, 5, 5)));
+            model.Add(new Conv2D(64, (3, 3).ToTuple(), activation: "relu", padding: "same", data_format: "channels_last", kernel_regularizer: "l2"));
+            //model.Add(new Conv2D(64, (3, 3).ToTuple(), activation: "relu", padding: "same", data_format: "channels_last", kernel_regularizer: "l2"));
+            //model.Add(new Conv2D(128, (3, 3).ToTuple(), activation: "relu", padding: "same", data_format: "channels_last", kernel_regularizer: "l2"));
+            //model.Add(new Conv2D(2, (1, 1).ToTuple(), activation: "relu", padding: "same", data_format: "channels_last", kernel_regularizer: "l2"));
             model.Add(new Flatten());
-            model.Add(new Dense(64, activation: "relu"));
+            model.Add(new Dense(64, activation: "relu", kernel_regularizer: "l2"));
             model.Add(new Dense(1, activation: "tanh"));
             model.Summary();
             Model = model;
@@ -93,7 +91,19 @@ namespace project
         {
             using (Py.GIL())
             {
-                return Model.PredictOnBatch(np.array(board).reshape(1, 5, 5)).GetData<float>().FirstOrDefault();
+                var myBoard = new int[boardSize, boardSize];
+                var enemyBoard = new int[boardSize, boardSize];
+
+                for (int y = 0; y < boardSize; y++)
+                    for (int x = 0; x < boardSize; x++)
+                    {
+                        if (board[y, x] == 1) myBoard[y, x] = 1;
+                        else if (board[y, x] == -1) enemyBoard[y, x] = 1;
+                    }
+
+                var predictionInput = np.expand_dims(np.array(new NDarray[] { myBoard, enemyBoard }), 0);
+
+                return Model.PredictOnBatch(predictionInput).GetData<float>().FirstOrDefault();
             }
         }
     }

@@ -6,7 +6,7 @@
         public const int BoardSize = GameManager.BoardSize;
         public static void Run(int runs)
         {
-
+            ValueNetwork.ConsumeMovesFromDB();
             while (true)
             {
                 var win = 0;
@@ -44,6 +44,7 @@
                     }
                 }
                 Console.WriteLine("win:{0}, loss:{1}, draw:{2}", win, loss, draw);
+                ValueNetwork.ConsumeMovesFromDB();
                 ValueNetwork.LoadModel();
             }
         }
