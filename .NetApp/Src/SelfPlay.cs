@@ -6,7 +6,7 @@
         public const int BoardSize = GameManager.BoardSize;
         public static void Run(int runs)
         {
-            ValueNetwork.ConsumeMovesFromDB();
+            //ValueNetwork.ConsumeMovesFromDB();
             while (true)
             {
                 var win = 0;
@@ -14,7 +14,7 @@
                 var draw = 0;
                 for (int i = 0; i < runs; i++)
                 {
-                    var game = new Game(GameManager.RandomStringGenerator(), MaxTime: 300);
+                    var game = new Game(GameManager.RandomStringGenerator(), MaxTime: 2000);
                     while (true)
                     {
                         var Move = new Move();

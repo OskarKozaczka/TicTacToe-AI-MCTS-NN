@@ -24,9 +24,20 @@ namespace project
                     if (!string.IsNullOrWhiteSpace(line))
                     {
                         var board = JsonConvert.DeserializeObject<int[,]>(line.Split(';')[0]);
+
+                        var myBoard = new int[boardSize, boardSize];
+                        var enemyBoard = new int[boardSize, boardSize];
+
+                        for (int y = 0; y < boardSize; y++)
+                            for (int x = 0; x < boardSize; x++)
+                            {
+                                if (board[y, x] == 1) myBoard[y, x] = 1;
+                                else if (board[y, x] == -1) enemyBoard[y, x] = 1;
+                            }
+
                         var result = int.Parse(line.Split(';')[1]);
 
-                        features.Add(np.array(board));
+                        features.Add(np.array(new NDarray[] { myBoard, enemyBoard }));
                         labels.Add(np.array(result));
 
                         //for (int y = 0; y < boardSize; y++)
@@ -86,6 +97,15 @@ namespace project
 
                             features.Add(np.array(new NDarray[] {myBoard,enemyBoard}));
                             labels.Add(np.array(result));
+
+                            for (int y = 0; y < boardSize; y++)
+                                for (int x = 0; x < boardSize; x++)
+                                {
+                                    myBoard[y, x] = myBoard[y, x] * -1;
+                                    enemyBoard[y, x] = enemyBoard[y, x] * -1;
+                                }
+                            features.Add(np.array(new NDarray[] { myBoard, enemyBoard }));
+                            labels.Add(np.array(-result));
                         }
                     }
             }

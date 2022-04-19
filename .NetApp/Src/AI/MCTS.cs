@@ -44,9 +44,6 @@ namespace project.Src.MCTS
                     }
 
                 float ?value = 0f;
-                var Move = new Move();
-                Move.X = action % boardSize;
-                Move.Y = action / boardSize;
                 if (Game.CheckForWinner(nextBoard, 1)) value = -1;
                 else if (Game.CheckForWinner(nextBoard, -1)) value = 1;
                 else if (Game.CheckForDraw(nextBoard)) value = 0;
@@ -54,10 +51,10 @@ namespace project.Src.MCTS
 
                 if (value is null)
                 {
-                    value = useNetowork ? -ValueNetwork.MakePrediction(nextBoard)/10 : 0;
+                    value = useNetowork ? -ValueNetwork.MakePrediction(nextBoard) : 0;
                     node.Expand(nextBoard, -parent.toPlay);
                 }
-                node.BackPropagate(path, value.Value, parent.toPlay * -1);
+                node.BackPropagate(path, value.Value, -parent.toPlay);
             }
             stopwatch.Stop();
             return root;

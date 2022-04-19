@@ -22,7 +22,7 @@ namespace project
             PythonEngine.Initialize();
             PythonEngine.BeginAllowThreads();
             ValueNetwork.LoadModel();
-            SelfPlay.Run(10);
+            //SelfPlay.Run(10);
             CreateHostBuilder(args).Build().Run();
         }
 
