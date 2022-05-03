@@ -25,8 +25,12 @@ namespace project
             this.GameID = GameID;
             Board = new int[BoardSize, BoardSize];
             Array.Clear(Board, 0, Board.Length);
-            if (random.Next(0, 2) == 0) MakeAIMove(out _);
-        }
+            if (random.Next(0, 2) == 0) 
+                {
+                MakeAIMove(out _);
+                DataManager.WriteMoveToJournal(Board, GameID);
+                }
+            }
 
         public MoveResponseModel MakeMove(Move move)
         {
