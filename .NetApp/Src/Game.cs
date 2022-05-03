@@ -25,7 +25,7 @@ namespace project
             this.GameID = GameID;
             Board = new int[BoardSize, BoardSize];
             Array.Clear(Board, 0, Board.Length);
-           // if (random.Next(0, 2) == 0) MakeAIMove(out _);
+            if (random.Next(0, 2) == 0) MakeAIMove(out _);
         }
 
         public MoveResponseModel MakeMove(Move move)
@@ -50,6 +50,7 @@ namespace project
             if (moveResponse.GameStateMessage != "") return moveResponse;
 
             moveResponse.MoveID = MakeAIMove(out Move AIMove);
+            DataManager.WriteMoveToJournal(Board, GameID);
 
             if (CheckForWinner(Board, -1))
             {
@@ -167,7 +168,7 @@ namespace project
                 }
 
             var root = _mcts.Run(board,1, MaxTime);
-            Console.WriteLine("Number of Simulations: " + root.visitCount);
+            //Console.WriteLine("Number of Simulations: " + root.visitCount);
             var bestValue = -1f;
             var bestMove = 0;
             foreach (var child in root.children)
@@ -186,7 +187,7 @@ namespace project
             //Console.WriteLine((int)Winner);
             DataManager.UpdateGameResult(GameID, (int)Winner);
             DataManager.MoveGameToDB(GameID);
-            ValueNetwork.ConsumeMovesFromDB();
+            //ValueNetwork.ConsumeMovesFromDB();
             GameManager.DisposeGame(GameID);
             ValueNetwork.LoadModel();
         }

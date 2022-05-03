@@ -98,13 +98,7 @@ namespace project
                             features.Add(np.array(new NDarray[] {myBoard,enemyBoard}));
                             labels.Add(np.array(result));
 
-                            for (int y = 0; y < boardSize; y++)
-                                for (int x = 0; x < boardSize; x++)
-                                {
-                                    myBoard[y, x] = myBoard[y, x] * -1;
-                                    enemyBoard[y, x] = enemyBoard[y, x] * -1;
-                                }
-                            features.Add(np.array(new NDarray[] { myBoard, enemyBoard }));
+                            features.Add(np.array(new NDarray[] {enemyBoard, myBoard}));
                             labels.Add(np.array(-result));
                         }
                     }
@@ -124,9 +118,17 @@ namespace project
 
         internal static void UpdateGameResult(string GameID, int result)
         {
+            Console.WriteLine(result);
             var filePath = $"data/journal/{GameID}.txt";
             var lines = File.ReadAllLines(filePath);
-            var newLines = lines.Select(line => line + result.ToString()).ToList();
+
+            var newLines = new List<string>();
+
+            foreach (var line in lines)
+            {
+                newLines.Add(line + result.ToString());
+            }
+
             File.Delete(filePath);
             File.WriteAllLines(filePath, newLines);
         }

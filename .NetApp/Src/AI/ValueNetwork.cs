@@ -14,9 +14,9 @@ namespace project
     public class ValueNetwork
     {
 
-        const int batch_size = 10;
-        const int epochs = 500;
-        const int verbose = 2;
+        const int batch_size = 500;
+        const int epochs = 1000;
+        const int verbose = 0;
         const int layers = 3;
         public const int boardSize = GameManager.BoardSize;
 
@@ -26,9 +26,9 @@ namespace project
             var model = new Sequential();
             model.Add(new Input(shape: new Shape(2, 5, 5)));
             model.Add(new Conv2D(64, (3, 3).ToTuple(), activation: "relu", padding: "same", data_format: "channels_last", kernel_regularizer: "l2"));
-            //model.Add(new Conv2D(64, (3, 3).ToTuple(), activation: "relu", padding: "same", data_format: "channels_last", kernel_regularizer: "l2"));
-            //model.Add(new Conv2D(128, (3, 3).ToTuple(), activation: "relu", padding: "same", data_format: "channels_last", kernel_regularizer: "l2"));
-            //model.Add(new Conv2D(2, (1, 1).ToTuple(), activation: "relu", padding: "same", data_format: "channels_last", kernel_regularizer: "l2"));
+            model.Add(new Conv2D(64, (3, 3).ToTuple(), activation: "relu", padding: "same", data_format: "channels_last", kernel_regularizer: "l2"));
+            model.Add(new Conv2D(64, (3, 3).ToTuple(), activation: "relu", padding: "same", data_format: "channels_last", kernel_regularizer: "l2"));
+            model.Add(new Conv2D(2, (1, 1).ToTuple(), activation: "relu", padding: "same", data_format: "channels_last", kernel_regularizer: "l2"));
             model.Add(new Flatten());
             model.Add(new Dense(64, activation: "relu", kernel_regularizer: "l2"));
             model.Add(new Dense(1, activation: "tanh"));
