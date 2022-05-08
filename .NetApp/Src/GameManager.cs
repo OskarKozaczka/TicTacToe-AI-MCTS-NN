@@ -1,8 +1,5 @@
-﻿using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.Text;
-using project.Models;
+﻿using System.Text;
+
 
 namespace project
 {
@@ -14,13 +11,13 @@ namespace project
 
         private static readonly Dictionary<string, Game> GamesDict = new();
 
-        public static string CreateNewGame()
+         public static string CreateNewGame()
         {
             var GameID = RandomStringGenerator();
 
             try
             {
-                GamesDict.Add(GameID, new Game(GameID));
+                 GamesDict.Add(GameID, new Game(GameID));
             }
             catch
             {

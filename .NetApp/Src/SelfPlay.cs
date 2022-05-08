@@ -1,4 +1,6 @@
-﻿namespace project.Src
+﻿using System.IO;
+
+namespace project.Src
 {
     public class SelfPlay
     {
@@ -14,7 +16,7 @@
                 var draw = 0;
                 for (int i = 0; i < runs; i++)
                 {
-                    var game = new Game(GameManager.RandomStringGenerator(), MaxTime: 1000);
+                    var game = new Game(GameManager.RandomStringGenerator(), MaxTime: 200);
                     while (true)
                     {
                         var Move = new Move();
@@ -43,7 +45,7 @@
                         }
                     }
                 }
-                Console.WriteLine("win:{0}, loss:{1}, draw:{2}", win, loss, draw);
+                Console.WriteLine("win:{0}, draw:{2}, loss:{1}", win, loss, draw);
                 ValueNetwork.ConsumeMovesFromDB();
                 ValueNetwork.LoadModel();
             }

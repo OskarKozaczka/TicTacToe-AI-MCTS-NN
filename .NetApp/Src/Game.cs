@@ -29,7 +29,7 @@ namespace project
                 {
                 MakeAIMove(out _);
                 DataManager.WriteMoveToJournal(Board, GameID);
-                }
+            }
             }
 
         public MoveResponseModel MakeMove(Move move)
@@ -173,13 +173,13 @@ namespace project
 
             var root = _mcts.Run(board,1, MaxTime);
             //Console.WriteLine("Number of Simulations: " + root.visitCount);
-            var bestValue = -1f;
-            var bestMove = 0;
+            var bestValue = -2f;
+            var bestMove = -1;
             foreach (var child in root.children)
             {
-                if (child is not null && child.value > bestValue)
+                if (child is not null && child.visitCount> bestValue)
                 {
-                    bestValue = child.value;
+                    bestValue = child.visitCount;
                     bestMove = Array.IndexOf(root.children, child);
                 }
             }

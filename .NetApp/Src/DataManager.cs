@@ -81,6 +81,11 @@ namespace project
                         {
                             var board = JsonConvert.DeserializeObject<int[,]>(line.Split(';')[0]);
 
+                            var result = int.Parse(line.Split(';')[1]);
+
+                            if (result == 0) continue;
+
+
                             var myBoard = new int[boardSize, boardSize];
                             var enemyBoard = new int[boardSize, boardSize];
 
@@ -90,16 +95,24 @@ namespace project
                                     if (board[y, x] == 1) myBoard[y, x] = 1;
                                     else if (board[y, x] == -1) enemyBoard[y, x] = 1;
                                 }
+                            
 
-                            var result = int.Parse(line.Split(';')[1]);
+                            for (int i = 0; i < 4; i++)
+                            {
+                                features.Add(np.array(new NDarray[] { np.rot90(np.array(myBoard),i), np.rot90(np.array(enemyBoard),i) }));
+                                labels.Add(np.array(result));
 
-                            if (result==0) continue;
+                                features.Add(np.array(new NDarray[] { np.rot90(np.array(enemyBoard),i), np.rot90(np.array(myBoard),i) }));
+                                labels.Add(np.array(-result));
 
-                            features.Add(np.array(new NDarray[] {myBoard,enemyBoard}));
-                            labels.Add(np.array(result));
+                                features.Add(np.array(new NDarray[] { np.fliplr(np.array(myBoard)), np.fliplr(np.array(enemyBoard)) }));
+                                labels.Add(np.array(result));
 
-                            features.Add(np.array(new NDarray[] {enemyBoard, myBoard}));
-                            labels.Add(np.array(-result));
+                                features.Add(np.array(new NDarray[] { np.fliplr(np.array(enemyBoard)), np.fliplr(np.array(myBoard)) }));
+                                labels.Add(np.array(-result));
+                            }
+
+                                 
                         }
                     }
             }
@@ -140,7 +153,12 @@ namespace project
             while (File.Exists($"data/DB/{gameID}({index}).txt")) index++;
             try
             {
-                File.Move($"data/journal/{gameID}.txt", $"data/DB/{gameID}({index}).txt");
+                var file = $"data/journal/{gameID}.txt";
+                if (File.Exists(file))
+                {
+                    File.Move(file, $"data/DB/{gameID}({index}).txt");
+                }
+                
             }
             catch (FileNotFoundException e)
             {

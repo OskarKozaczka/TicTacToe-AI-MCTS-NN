@@ -1,13 +1,10 @@
 ﻿using Keras;
+using Keras.Callbacks;
 using Keras.Layers;
 using Keras.Models;
 using Numpy;
-using Python.Runtime;
-using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using Keras.Regularizers;
+
 
 namespace project
 {
@@ -15,22 +12,26 @@ namespace project
     {
 
         const int batch_size = 500;
-        const int epochs = 1000;
-        const int verbose = 0;
+        const int epochs = 10;
+        const int verbose = 2;
         const int layers = 3;
+        const float l2 = 0.0001f;
         public const int boardSize = GameManager.BoardSize;
 
         private static BaseModel Model;
+
+        
         public static void CreateModel()
         {
             var model = new Sequential();
-            model.Add(new Input(shape: new Shape(2, 5, 5)));
-            model.Add(new Conv2D(64, (3, 3).ToTuple(), activation: "relu", padding: "same", data_format: "channels_last", kernel_regularizer: "l2"));
-            model.Add(new Conv2D(64, (3, 3).ToTuple(), activation: "relu", padding: "same", data_format: "channels_last", kernel_regularizer: "l2"));
-            model.Add(new Conv2D(64, (3, 3).ToTuple(), activation: "relu", padding: "same", data_format: "channels_last", kernel_regularizer: "l2"));
-            model.Add(new Conv2D(2, (1, 1).ToTuple(), activation: "relu", padding: "same", data_format: "channels_last", kernel_regularizer: "l2"));
+
+
+            model.Add(new Input(shape: new Shape(2, boardSize, boardSize)));
+            model.Add(new Conv2D(64, (3, 3).ToTuple(), activation: "relu", padding: "same", data_format: "channels_last"));
+            model.Add(new Conv2D(32, (3, 3).ToTuple(), activation: "relu", padding: "same", data_format: "channels_last"));
+            model.Add(new Conv2D(16, (3, 3).ToTuple(), activation: "relu", padding: "same", data_format: "channels_last"));
             model.Add(new Flatten());
-            model.Add(new Dense(64, activation: "relu", kernel_regularizer: "l2"));
+            model.Add(new Dense(32, activation: "relu"));
             model.Add(new Dense(1, activation: "tanh"));
             model.Summary();
             Model = model;
@@ -51,7 +52,8 @@ namespace project
             using (Py.GIL())
             {
                 var data = DataManager.ReadAndPrepareDataFromDB();
-                Model.Fit(data.features, data.labels, batch_size: batch_size, epochs: epochs, verbose: verbose, validation_split: 0.1f);
+                Model.Fit(data.features, data.labels, batch_size: batch_size, epochs: epochs, verbose: verbose, validation_split: 0.1f,callbacks:new Callback[] { new ReduceLROnPlateau() });
+                Model.Evaluate(data.features, data.labels, batch_size: 500,verbose: 2);
                 SaveModel();
             }
         }
@@ -81,9 +83,9 @@ namespace project
                     var loadedModel = Sequential.ModelFromJson(File.ReadAllText("data/model/model.json"));
                     loadedModel.LoadWeight("data/model/model.h5");
                     Model = loadedModel;
-                    Model.Compile(optimizer: "adam", loss: "mean_squared_error");
+                    Model.Compile(optimizer: "adam", loss: "mean_squared_error", metrics: new string[] { "accuracy" });
                 }
-                catch (Exception ex) { }
+                catch (Exception ex) { throw ex; }
             }
         }
 

@@ -10,9 +10,13 @@ namespace project.Src.MCTS
 
         private bool useNetowork;
 
+        private Random random;
+
         public MCTS(bool useNetowork = false)
         {
             this.useNetowork = useNetowork;
+
+            this.random = new Random();
         }
 
         public Node Run(int[,] Board, int toPlay, int MaxTime)
@@ -44,14 +48,14 @@ namespace project.Src.MCTS
                     }
 
                 float ?value = 0f;
-                if (Game.CheckForWinner(nextBoard, 1)) value = -1;
-                else if (Game.CheckForWinner(nextBoard, -1)) value = 1;
+                if (Game.CheckForWinner(nextBoard, 1)) value = 1;
+                else if (Game.CheckForWinner(nextBoard, -1)) value = -1;
                 else if (Game.CheckForDraw(nextBoard)) value = 0;
                 else value = null;
 
                 if (value is null)
                 {
-                    value = useNetowork ? -ValueNetwork.MakePrediction(nextBoard) : 0;
+                    value = useNetowork ? ValueNetwork.MakePrediction(nextBoard) : (random.NextSingle()-0.5f)/10000;
                     node.Expand(nextBoard, -parent.toPlay);
                 }
                 node.BackPropagate(path, value.Value, -parent.toPlay);
