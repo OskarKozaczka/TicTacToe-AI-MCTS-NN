@@ -16,7 +16,7 @@ namespace project.Src
                 var draw = 0;
                 for (int i = 0; i < runs; i++)
                 {
-                    var game = new Game(GameManager.RandomStringGenerator(), MaxTime: 200);
+                    var game = new Game(GameManager.RandomStringGenerator(), MaxTime: 2000);
                     while (true)
                     {
                         var Move = new Move();
@@ -46,8 +46,8 @@ namespace project.Src
                     }
                 }
                 Console.WriteLine("win:{0}, draw:{2}, loss:{1}", win, loss, draw);
+                ValueNetwork.SaveModelAs(win,draw,loss) ;
                 ValueNetwork.ConsumeMovesFromDB();
-                ValueNetwork.LoadModel();
             }
         }
     }

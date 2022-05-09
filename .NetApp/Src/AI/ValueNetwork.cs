@@ -12,7 +12,7 @@ namespace project
     {
 
         const int batch_size = 500;
-        const int epochs = 10;
+        const int epochs = 1;
         const int verbose = 2;
         const int layers = 3;
         const float l2 = 0.0001f;
@@ -47,6 +47,15 @@ namespace project
             }
         }
 
+        internal static void SaveModelAs(int win, int draw, int loss)
+        {
+            using (Py.GIL())
+            {
+                Model.SaveWeight(string.Format("data/model/model-{0}-{1}-{2}.h5", win, draw, loss));
+            }
+                
+        }
+
         public static void ConsumeMovesFromDB()
         {
             using (Py.GIL())
@@ -61,8 +70,7 @@ namespace project
         public static void SaveModel()
         {
             try
-            {
-                File.WriteAllText("data/model/model.json", Model.ToJson());
+            {   if (!File.Exists("data/model/model.json")) File.WriteAllText("data/model/model.json", Model.ToJson());
                 Model.SaveWeight("data/model/model.h5");
             }
             catch (Exception ex) { }

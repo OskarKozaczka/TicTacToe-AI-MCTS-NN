@@ -159,7 +159,7 @@ namespace project
             return Board;
         }
 
-        public int GetAIMove(bool useNetwork = true)
+        public int GetAIMove(bool useNetwork = false)
         {
             //return AI.GetMove(Board.Clone() as int[,]);
             var _mcts = new MCTS(useNetwork);
