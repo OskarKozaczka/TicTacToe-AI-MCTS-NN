@@ -13,13 +13,13 @@ namespace project
         public const int BoardSize  = GameManager.BoardSize;  
         private const int SymbolsInRow = GameManager.SymbolsInRow;
 
-        int MaxTime { get; set; }
+        int simNum { get; set; }
         public string GameID { get; set; }
         public int[,] Board { get; set; }
 
-        public Game(string GameID, int MaxTime = 6000)
+        public Game(string GameID, int simNum = 3000)
         {
-            this.MaxTime = MaxTime;
+            this.simNum = simNum;
 
             var random = new Random();
             this.GameID = GameID;
@@ -159,7 +159,7 @@ namespace project
             return Board;
         }
 
-        public int GetAIMove(bool useNetwork = false)
+        public int GetAIMove(bool useNetwork = true)
         {
             //return AI.GetMove(Board.Clone() as int[,]);
             var _mcts = new MCTS(useNetwork);
@@ -171,7 +171,7 @@ namespace project
                     board[y, x] = board[y, x] * -1;
                 }
 
-            var root = _mcts.Run(board,1, MaxTime);
+            var root = _mcts.Run(board,1, simNum);
             //Console.WriteLine("Number of Simulations: " + root.visitCount);
             var bestValue = -2f;
             var bestMove = -1;

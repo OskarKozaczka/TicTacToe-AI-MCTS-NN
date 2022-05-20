@@ -16,7 +16,7 @@ namespace project.Src
                 var draw = 0;
                 for (int i = 0; i < runs; i++)
                 {
-                    var game = new Game(GameManager.RandomStringGenerator(), MaxTime: 2000);
+                    var game = new Game(GameManager.RandomStringGenerator(), simNum: 2000);
                     while (true)
                     {
                         var Move = new Move();

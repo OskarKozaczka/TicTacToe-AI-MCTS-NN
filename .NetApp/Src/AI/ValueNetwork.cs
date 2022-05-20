@@ -12,7 +12,7 @@ namespace project
     {
 
         const int batch_size = 500;
-        const int epochs = 1;
+        const int epochs = 3;
         const int verbose = 2;
         const int layers = 3;
         const float l2 = 0.0001f;

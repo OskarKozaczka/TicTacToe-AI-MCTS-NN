@@ -19,12 +19,11 @@ namespace project.Src.MCTS
             this.random = new Random();
         }
 
-        public Node Run(int[,] Board, int toPlay, int MaxTime)
+        public Node Run(int[,] Board, int toPlay, int simNum)
         {
             var root = new Node(toPlay);
             root.Expand(Board, toPlay);
-            var stopwatch = Stopwatch.StartNew();
-            while(stopwatch.ElapsedMilliseconds <= MaxTime)
+            for (int i = 0; i < simNum; i++)
             {
                 var node = root;
                 var path = new List<Node> { node };
@@ -60,7 +59,6 @@ namespace project.Src.MCTS
                 }
                 node.BackPropagate(path, value.Value, -parent.toPlay);
             }
-            stopwatch.Stop();
             return root;
 
         }
