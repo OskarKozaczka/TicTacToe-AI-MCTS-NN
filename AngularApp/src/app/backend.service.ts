@@ -22,15 +22,13 @@ export class BackendService {
     return await this.http.post<MoveResponse>(url, move).toPromise();
   }
 
-  CreateNewGame() {
+  async CreateNewGame() {
     var url = CreateNewGameUrl;
-    this.http.post(url, null, { responseType: 'text' }).subscribe(
+    await this.http.post(url, null, { responseType: 'text' }).subscribe(
       (text) => this.router.navigate(['/game/' + text]),
       (error) => console.log('Error Creating a Game:' + error)
     );
   }
-
-
 
   async GetBoard(id: string) {
     var url = GetBoardUrl + id;

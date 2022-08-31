@@ -20,6 +20,7 @@ namespace project.Src.MCTS
             this.isExpanded = false;
             this.children = new Node[25];
         }
+
         internal static float ucbScore(Node parent, Node child)
         {
             var prior_score =  Math.Sqrt(parent.visitCount) / (child.visitCount + 1);
@@ -29,6 +30,7 @@ namespace project.Src.MCTS
 
             return valueScore + (float)prior_score;
         }
+
         internal void Expand(int[,] board, int toPlay)
         {
             this.isExpanded = true;

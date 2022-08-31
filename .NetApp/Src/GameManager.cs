@@ -43,17 +43,39 @@ namespace project
 
         public static void DisposeGame(string gameID)
         {
+            try
+            {
             GamesDict.Remove(gameID);
+            }
+            catch
+            {
+                throw new GameIsOverException();
+            }
         }
 
         public static string GetBoard(string id)
         {
-            return JsonConvert.SerializeObject(GamesDict[id].GetBoard());
+            try
+            {
+                return JsonConvert.SerializeObject(GamesDict[id].GetBoard());
+            }
+            catch(KeyNotFoundException)
+            {
+                throw new GameNotFoundException();
+            }
+            
         }
 
         public static MoveResponseModel GetMove(string id, Move value)
         {
-            return GamesDict[id].MakeMove(value);
+            try
+            {
+                return GamesDict[id].MakeMove(value);
+            }
+            catch(KeyNotFoundException)
+            {
+                throw new GameNotFoundException();
+            }
         }
     }
 }

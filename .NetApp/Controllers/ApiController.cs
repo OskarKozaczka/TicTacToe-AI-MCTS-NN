@@ -9,23 +9,22 @@ namespace project.Controllers
     [ApiController]
     public class ApiController : ControllerBase
     {
+        [HttpPost("CreateNewGame")]
+        public string CreateNewGame()
+        {
+            return GameManager.CreateNewGame();
+        }
+
         [HttpGet("GetBoard/{id}")]
         public string GetBoard(string id)
         {
             return GameManager.GetBoard(id);
         }
 
-        // POST api/GetMove/id
         [HttpPost("GetMove/{id}")]
-        public MoveResponseModel GetMovePost(string id, [FromBody] Move value)
+        public MoveResponseModel GetMove(string id, [FromBody] Move value)
         {
             return GameManager.GetMove(id, value);
-        }
-
-        [HttpPost("CreateNewGame")]
-        public string CreateNewGamePost()
-        {
-            return GameManager.CreateNewGame();
         }
     }
 }

@@ -39,15 +39,6 @@ namespace project
 
                         features.Add(np.array(new NDarray[] { myBoard, enemyBoard }));
                         labels.Add(np.array(result));
-
-                        //for (int y = 0; y < boardSize; y++)
-                        //    for (int x = 0; x < boardSize; x++)
-                        //    {
-                        //        board[y, x] = board[y, x] * -1;
-                        //    }
-                        //features.Add(np.array(board));
-                        //labels.Add(np.array(-result));
-
                     }
                 }
             }
@@ -80,12 +71,8 @@ namespace project
                         if (!string.IsNullOrWhiteSpace(line))
                         {
                             var board = JsonConvert.DeserializeObject<int[,]>(line.Split(';')[0]);
-
                             var result = int.Parse(line.Split(';')[1]);
-
                             if (result == 0) continue;
-
-
                             var myBoard = new int[boardSize, boardSize];
                             var enemyBoard = new int[boardSize, boardSize];
 
@@ -96,7 +83,6 @@ namespace project
                                     else if (board[y, x] == -1) enemyBoard[y, x] = 1;
                                 }
                             
-
                             for (int i = 0; i < 4; i++)
                             {
                                 features.Add(np.array(new NDarray[] { np.rot90(np.array(myBoard),i), np.rot90(np.array(enemyBoard),i) }));
@@ -110,9 +96,7 @@ namespace project
 
                                 features.Add(np.array(new NDarray[] { np.fliplr(np.array(enemyBoard)), np.fliplr(np.array(myBoard)) }));
                                 labels.Add(np.array(-result));
-                            }
-
-                                 
+                            }       
                         }
                     }
             }
@@ -131,16 +115,11 @@ namespace project
 
         internal static void UpdateGameResult(string GameID, int result)
         {
-            Console.WriteLine(result);
             var filePath = $"data/journal/{GameID}.txt";
             var lines = File.ReadAllLines(filePath);
-
             var newLines = new List<string>();
 
-            foreach (var line in lines)
-            {
-                newLines.Add(line + result.ToString());
-            }
+            foreach (var line in lines) newLines.Add(line + result.ToString());
 
             File.Delete(filePath);
             File.WriteAllLines(filePath, newLines);
@@ -154,11 +133,7 @@ namespace project
             try
             {
                 var file = $"data/journal/{gameID}.txt";
-                if (File.Exists(file))
-                {
-                    File.Move(file, $"data/DB/{gameID}({index}).txt");
-                }
-                
+                if (File.Exists(file)) File.Move(file, $"data/DB/{gameID}({index}).txt");
             }
             catch (FileNotFoundException e)
             {

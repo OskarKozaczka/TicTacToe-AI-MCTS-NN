@@ -20,17 +20,16 @@ namespace project
         public Game(string GameID, int simNum = 3000)
         {
             this.simNum = simNum;
-
             var random = new Random();
             this.GameID = GameID;
             Board = new int[BoardSize, BoardSize];
             Array.Clear(Board, 0, Board.Length);
             if (random.Next(0, 2) == 0) 
-                {
+            {
                 MakeAIMove(out _);
                 DataManager.WriteMoveToJournal(Board, GameID);
             }
-            }
+        }
 
         public MoveResponseModel MakeMove(Move move)
         {
@@ -39,44 +38,37 @@ namespace project
             if (Board[move.Y, move.X] == 0) Board[move.Y, move.X] = 1; else throw new InvalidMoveException();
             DataManager.WriteMoveToJournal(Board, GameID);
 
-            if (CheckForWinner(Board, 1))
-                {
-                RunEndGame(1);
-                moveResponse.GameStateMessage = "You won!";
-            }
-
-            if (CheckForDraw(Board))
-            {
-                RunEndGame(0);
-                moveResponse.GameStateMessage = "Draw";
-            }
+            CheckForGameEnd(ref moveResponse);
 
             if (moveResponse.GameStateMessage != "") return moveResponse;
 
             moveResponse.MoveID = MakeAIMove(out Move AIMove);
             DataManager.WriteMoveToJournal(Board, GameID);
 
-            if (CheckForWinner(Board, -1))
-            {
-                RunEndGame(-1);
-                moveResponse.GameStateMessage = "You Lost :(";
-            }
-            
-
-            if (CheckForDraw(Board))
-            {
-                RunEndGame(0);
-                moveResponse.GameStateMessage = "Draw";
-            }
+            CheckForGameEnd(ref moveResponse);
 
             return moveResponse;
 
-            void RunEndGame(int winner){
+            void CheckForGameEnd(ref MoveResponseModel moveResponse)
+            {
+                if (CheckForWinner(Board, 1))
+                {
+                    EndGame(1);
+                    moveResponse.GameStateMessage = "You won!";
+                }
 
-            Thread thread = new(EndGame);
-            thread.Start(winner);
+                if (CheckForDraw(Board))
+                {
+                    EndGame(0);
+                    moveResponse.GameStateMessage = "Draw";
+                }
+
+                if (CheckForWinner(Board, -1))
+                {
+                    EndGame(-1);
+                    moveResponse.GameStateMessage = "You Lost :(";
+                }
             }
-            
         }
 
         public int MakeAIMove(out Move AIMove)
@@ -188,10 +180,8 @@ namespace project
 
         public void EndGame(object Winner)
         {
-            //Console.WriteLine((int)Winner);
             DataManager.UpdateGameResult(GameID, (int)Winner);
             DataManager.MoveGameToDB(GameID);
-            //ValueNetwork.ConsumeMovesFromDB();
             GameManager.DisposeGame(GameID);
             ValueNetwork.LoadModel();
         }
