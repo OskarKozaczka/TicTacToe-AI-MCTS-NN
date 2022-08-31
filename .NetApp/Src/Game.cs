@@ -13,65 +13,65 @@ namespace project
         public const int BoardSize  = GameManager.BoardSize;  
         private const int SymbolsInRow = GameManager.SymbolsInRow;
 
+        int simNum { get; set; }
         public string GameID { get; set; }
         public int[,] Board { get; set; }
 
-        public Game(string GameID)
+        public Game(string GameID, int simNum = 3000)
         {
+            this.simNum = simNum;
             var random = new Random();
             this.GameID = GameID;
             Board = new int[BoardSize, BoardSize];
             Array.Clear(Board, 0, Board.Length);
-           // if (random.Next(0, 2) == 0) MakeAIMove(out _);
+            if (random.Next(0, 2) == 0) 
+            {
+                MakeAIMove(out _);
+                DataManager.WriteMoveToJournal(Board, GameID);
+            }
         }
 
-        public object MakeMove(Move move)
+        public MoveResponseModel MakeMove(Move move)
         {
             var moveResponse = new MoveResponseModel();
 
-            WriteMoveToJournal(move);
             if (Board[move.Y, move.X] == 0) Board[move.Y, move.X] = 1; else throw new InvalidMoveException();
+            DataManager.WriteMoveToJournal(Board, GameID);
 
-            if (CheckForWinner(Board, move, 1))
-                {
-                RunEndGame();
-                moveResponse.GameStateMessage = "You won!";
-            }
-
-            if (CheckForDraw(Board))
-            {
-                RunEndGame();
-                moveResponse.GameStateMessage = "Draw";
-            }
+            CheckForGameEnd(ref moveResponse);
 
             if (moveResponse.GameStateMessage != "") return moveResponse;
 
             moveResponse.MoveID = MakeAIMove(out Move AIMove);
+            DataManager.WriteMoveToJournal(Board, GameID);
 
-            if (CheckForWinner(Board, AIMove, -1))
+            CheckForGameEnd(ref moveResponse);
+
+            return moveResponse;
+
+            void CheckForGameEnd(ref MoveResponseModel moveResponse)
             {
-                RunEndGame();
-                moveResponse.GameStateMessage = "You Lost :(";
+                if (CheckForWinner(Board, 1))
+                {
+                    EndGame(1);
+                    moveResponse.GameStateMessage = "You won!";
+                }
+
+                if (CheckForDraw(Board))
+                {
+                    EndGame(0);
+                    moveResponse.GameStateMessage = "Draw";
+                }
+
+                if (CheckForWinner(Board, -1))
+                {
+                    EndGame(-1);
+                    moveResponse.GameStateMessage = "You Lost :(";
+                }
             }
-            
-
-            if (CheckForDraw(Board))
-            {
-                RunEndGame();
-                moveResponse.GameStateMessage = "Draw";
-            }
-
-            return JsonConvert.SerializeObject(moveResponse);
-
-            void RunEndGame(){
-
-            Thread thread = new(EndGame);
-            thread.Start();
-            }
-            
         }
 
-        private int MakeAIMove(out Move AIMove)
+        public int MakeAIMove(out Move AIMove)
         {
             AIMove = new Move();
             var AImoveInt = GetAIMove();
@@ -83,31 +83,8 @@ namespace project
             return AImoveInt;
         }
 
-        public static bool CheckForWinner(int[,] Board, Move move, int symbol)
+        public static bool CheckForWinner(int[,] Board, int symbol)
         {
-            //var horizontal = 1;
-            //for (int i = 1; i <= move.X; i++) if (Board[move.Y, move.X - i] == symbol) horizontal++; else break; //left
-            //for (int i = 1; i < BoardSize-move.X; i++) if (Board[move.Y, move.X + i] == symbol) horizontal++; else break; //right
-            //if(horizontal >= SymbolsInRow) return true;
-
-            //var vertical = 1;
-            //for (int i = 1; i <= move.Y; i++) if (Board[move.Y - i, move.X ] == symbol) vertical++; else break; //up
-            //for (int i = 1; i < BoardSize - move.Y; i++) if (Board[move.Y + i, move.X ] == symbol) vertical++; else break; //down
-            //if (vertical >= SymbolsInRow) return true;
-
-            //var diagonal1 = 1;
-            //for (int i = 1; i <= Min(move.X, move.Y); i++) if (Board[move.Y - i, move.X - i] == symbol) diagonal1++; else break; //up and left
-            //for (int i = 1; i < Min(BoardSize - move.X, BoardSize - move.Y); i++) if (Board[move.Y + i, move.X + i] == symbol) diagonal1++; else break; // down and right
-            //if (diagonal1 >= SymbolsInRow) return true;
-
-            //var diagonal2 = 1;
-            //for (int i = 1; i <= Min(move.X, BoardSize - move.Y -1); i++) if (Board[move.Y + i, move.X - i] == symbol) diagonal2++; else break; //down and left
-            //for (int i = 1; i <= Min(BoardSize - move.X -1, move.Y); i++) if (Board[move.Y - i, move.X + i] == symbol) diagonal2++; else break; //up and right
-            //if (diagonal2 >= SymbolsInRow) return true;
-
-            //return false;
-
-            
             for (int y = 0; y < BoardSize; y++)
             {
                 var symbolCount = 0;
@@ -174,16 +151,10 @@ namespace project
             return Board;
         }
 
-
-        public void WriteMoveToJournal(Move move)
-        {
-            File.AppendAllText($"data/journal/{GameID}.txt", JsonConvert.SerializeObject(Board) + ";" + JsonConvert.SerializeObject(move) + "\n");
-        }
-
-        public int GetAIMove()
+        public int GetAIMove(bool useNetwork = true)
         {
             //return AI.GetMove(Board.Clone() as int[,]);
-            var _mcts = new MCTS();
+            var _mcts = new MCTS(useNetwork);
             var board = Board.Clone() as int[,];
 
             for (int y = 0; y < BoardSize; y++)
@@ -192,26 +163,27 @@ namespace project
                     board[y, x] = board[y, x] * -1;
                 }
 
-            var root = _mcts.Run(board,1, 2000);
-            var bestValue = -1f;
-            var bestMove = 0;
+            var root = _mcts.Run(board,1, simNum);
+            //Console.WriteLine("Number of Simulations: " + root.visitCount);
+            var bestValue = -2f;
+            var bestMove = -1;
             foreach (var child in root.children)
             {
-                if (child is not null && child.value > bestValue)
+                if (child is not null && child.visitCount> bestValue)
                 {
-                    bestValue = child.value;
+                    bestValue = child.visitCount;
                     bestMove = Array.IndexOf(root.children, child);
                 }
             }
             return bestMove;
         }
 
-        public void EndGame()
+        public void EndGame(object Winner)
         {
-          //  AI.ConsumeMovesFromJournal(GameID);
-          //  DataManager.MoveGameToDB(GameID);
+            DataManager.UpdateGameResult(GameID, (int)Winner);
+            DataManager.MoveGameToDB(GameID);
             GameManager.DisposeGame(GameID);
-          //  AI.LoadModel();
+            ValueNetwork.LoadModel();
         }
     }
 }

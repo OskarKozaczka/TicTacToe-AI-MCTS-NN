@@ -59,9 +59,10 @@ export class BoardComponent implements OnInit {
       var MoveY = el.getAttribute('y') ?? '';
       var move = { x: MoveX, y: MoveY } as Move;
       var MoveResponse = await this.api.GetMoveFromApi(String(this.route.snapshot.paramMap.get('id')), move);
-      var id = MoveResponse.MoveID;
-      var gameStateMessage = MoveResponse.GameStateMessage;
-      document.getElementById(id.toString())!.style.backgroundColor = 'green'
+      console.log(MoveResponse);
+      var id = MoveResponse.moveID;
+      var gameStateMessage = MoveResponse.gameStateMessage;
+      if (id >= 0) document.getElementById(id.toString())!.style.backgroundColor = 'green'
       if (gameStateMessage != "") this.dialog.open(DialogContentExampleDialog, {data: {message: gameStateMessage}})
       this.PlayerTurn = true;
     }

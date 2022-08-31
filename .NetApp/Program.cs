@@ -1,7 +1,14 @@
+global using System;
+global using Newtonsoft.Json;
+global using Python.Runtime;
+global using System.Collections.Generic;
+global using System.Linq;
+global using project.Src;
+global using project.Models;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
-using Python.Runtime;
 using System.IO;
+
 
 namespace project
 {
@@ -14,7 +21,8 @@ namespace project
             Directory.CreateDirectory("data/model");
             PythonEngine.Initialize();
             PythonEngine.BeginAllowThreads();
-            AI.LoadModel();
+            ValueNetwork.LoadModel();
+            //SelfPlay.Run(100);
             CreateHostBuilder(args).Build().Run();
         }
 

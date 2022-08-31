@@ -1,7 +1,5 @@
-﻿using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Text;
+
 
 namespace project
 {
@@ -13,13 +11,13 @@ namespace project
 
         private static readonly Dictionary<string, Game> GamesDict = new();
 
-        public static string CreateNewGame()
+         public static string CreateNewGame()
         {
             var GameID = RandomStringGenerator();
 
             try
             {
-                GamesDict.Add(GameID, new Game(GameID));
+                 GamesDict.Add(GameID, new Game(GameID));
             }
             catch
             {
@@ -45,17 +43,39 @@ namespace project
 
         public static void DisposeGame(string gameID)
         {
+            try
+            {
             GamesDict.Remove(gameID);
+            }
+            catch
+            {
+                throw new GameIsOverException();
+            }
         }
 
         public static string GetBoard(string id)
         {
-            return JsonConvert.SerializeObject(GamesDict[id].GetBoard());
+            try
+            {
+                return JsonConvert.SerializeObject(GamesDict[id].GetBoard());
+            }
+            catch(KeyNotFoundException)
+            {
+                throw new GameNotFoundException();
+            }
+            
         }
 
-        public static object GetMove(string id, Move value)
+        public static MoveResponseModel GetMove(string id, Move value)
         {
-            return GamesDict[id].MakeMove(value);
+            try
+            {
+                return GamesDict[id].MakeMove(value);
+            }
+            catch(KeyNotFoundException)
+            {
+                throw new GameNotFoundException();
+            }
         }
     }
 }

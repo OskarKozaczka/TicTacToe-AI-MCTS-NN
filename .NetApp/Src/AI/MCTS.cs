@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Diagnostics;
+using System;
 
 namespace project.Src.MCTS
 {
@@ -7,13 +8,22 @@ namespace project.Src.MCTS
     {
         const int boardSize = GameManager.BoardSize;
 
-        public Node Run(int[,] Board, int toPlay, int MaxTime)
+        private bool useNetowork;
+
+        private Random random;
+
+        public MCTS(bool useNetowork = false)
+        {
+            this.useNetowork = useNetowork;
+
+            this.random = new Random();
+        }
+
+        public Node Run(int[,] Board, int toPlay, int simNum)
         {
             var root = new Node(toPlay);
             root.Expand(Board, toPlay);
-
-            var stopwatch = Stopwatch.StartNew();
-            while(stopwatch.ElapsedMilliseconds <= MaxTime)
+            for (int i = 0; i < simNum; i++)
             {
                 var node = root;
                 var path = new List<Node> { node };
@@ -37,28 +47,18 @@ namespace project.Src.MCTS
                     }
 
                 float ?value = 0f;
-                var Move = new Move();
-                Move.X = action % boardSize;
-                Move.Y = action / boardSize;
-                if (Game.CheckForWinner(nextBoard, Move, 1))
-                {
-                    value = -1;
-                }
-                else if (Game.CheckForWinner(nextBoard, Move, -1))
-                {
-                    value = 1;
-                }
-                else if (Game.CheckForDraw(nextBoard))value = 0;
+                if (Game.CheckForWinner(nextBoard, 1)) value = 1;
+                else if (Game.CheckForWinner(nextBoard, -1)) value = -1;
+                else if (Game.CheckForDraw(nextBoard)) value = 0;
                 else value = null;
 
                 if (value is null)
                 {
-                    value = 0;
-                    node.Expand(nextBoard, parent.toPlay * -1);
+                    value = useNetowork ? ValueNetwork.MakePrediction(nextBoard) : (random.NextSingle()-0.5f)/10000;
+                    node.Expand(nextBoard, -parent.toPlay);
                 }
-                node.BackPropagate(path, value.Value, parent.toPlay * -1);
+                node.BackPropagate(path, value.Value, -parent.toPlay);
             }
-            stopwatch.Stop();
             return root;
 
         }

@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
+﻿
 namespace project.Src.MCTS
 {
     public class Node
@@ -16,13 +14,22 @@ namespace project.Src.MCTS
         internal bool isExpanded { get; set; }
 
 
-    public Node(int toPlay)
+        public Node(int toPlay)
         {
             this.toPlay = toPlay;
             this.isExpanded = false;
             this.children = new Node[25];
         }
 
+        internal static float ucbScore(Node parent, Node child)
+        {
+            var prior_score =  Math.Sqrt(parent.visitCount) / (child.visitCount + 1);
+
+            var valueScore = 0f;
+            if (child.visitCount > 0) valueScore = -child.value;
+
+            return valueScore + (float)prior_score;
+        }
 
         internal void Expand(int[,] board, int toPlay)
         {
@@ -42,27 +49,31 @@ namespace project.Src.MCTS
                     i++;
                 }
             }
-
             possibilities.ForEach(x => children[x] = new Node(toPlay * -1));
-
         }
-
-
-
         internal Node SelectChild(out int action)
         {
-            Random random = new Random();
+            Random random = new();
 
-            var node = children[random.Next(children.Length)];
-            while (node is null)
+            var filteredChilds = children.Where(child => child is not null).ToArray();
+            //var node = filteredChilds[random.Next(filteredChilds.Length)];
+
+            var bestScore = -2d;
+            Node bestChild = null;
+
+            foreach (var child in filteredChilds)
             {
-                node = children[random.Next(children.Length)];
+                var score = ucbScore(this, child);
+
+                if (score > bestScore)
+                {
+                    bestScore = score;
+                    bestChild = child;
+                }
             }
-
-            action = Array.IndexOf(children, node);
-            return node;
+            action = Array.IndexOf(children, bestChild);
+            return bestChild;
         }
-
         internal void BackPropagate(List<Node> path, float value,int toPlay)
         {
             path.Reverse();
